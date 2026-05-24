@@ -15,14 +15,8 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b border-[var(--border)] bg-[var(--surface)]">
+    <header className="crt-bg sticky top-0 z-40 border-b border-[var(--border)]">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-2 gap-y-3 px-4 py-3 text-sm">
-        <Link href="/" className="ui-link text-base font-medium no-underline">
-          music blog
-        </Link>
-
-        <span className="ui-separator hidden sm:inline">|</span>
-
         <nav className="flex items-center gap-2">
           <Link href="/" className={navTabClass("/")}>
             <HomeIcon className="ui-tab-icon" />

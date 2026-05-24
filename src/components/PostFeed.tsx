@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { PlayAllBar } from "@/components/PlayAllBar";
 import { PostCard } from "@/components/PostCard";
 import { PostModal } from "@/components/PostModal";
 import type { PostPublic } from "@/types";
@@ -10,12 +9,9 @@ interface PostFeedProps {
   initialPosts: PostPublic[];
 }
 
-const SHOW_PLAY_ALL = false;
-
 export function PostFeed({ initialPosts }: PostFeedProps) {
   const [posts, setPosts] = useState(initialPosts);
   const [selectedPost, setSelectedPost] = useState<PostPublic | null>(null);
-  const [activePostId, setActivePostId] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
     const response = await fetch("/api/posts");
@@ -46,16 +42,11 @@ export function PostFeed({ initialPosts }: PostFeedProps) {
 
   return (
     <>
-      {SHOW_PLAY_ALL && (
-        <PlayAllBar posts={posts} onActivePostChange={setActivePostId} />
-      )}
-
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
         {posts.map((post) => (
           <PostCard
             key={post._id}
             post={post}
-            active={post._id === activePostId}
             onUpdated={refresh}
             onOpen={setSelectedPost}
           />

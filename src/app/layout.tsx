@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#222222",
+  themeColor: "#000000",
 };
 
 export default function RootLayout({
@@ -27,10 +27,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${firaCode.variable} h-full`}>
-      <body className="flex min-h-full flex-col font-mono antialiased">
+      <body className={`${firaCode.className} flex min-h-full flex-col`}>
         <AuthProvider>
           <Header />
-          <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
+          <main className="mx-auto w-full max-w-6xl flex-1 px-5 py-10">
             {children}
           </main>
         </AuthProvider>

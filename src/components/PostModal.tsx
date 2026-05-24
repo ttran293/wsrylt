@@ -95,7 +95,7 @@ export function PostModal({ post, onClose, onUpdated }: PostModalProps) {
         <div className="space-y-4 p-4">
           <YouTubePlayer url={post.posturl} />
 
-          {post.caption && <p className="text-sm">{post.caption}</p>}
+          {post.caption && <p className="ui-body text-[0.9375rem]">{post.caption}</p>}
 
           <div className="flex flex-wrap items-center gap-4 text-sm">
             <button
@@ -106,7 +106,7 @@ export function PostModal({ post, onClose, onUpdated }: PostModalProps) {
             >
               {userLike ? "♥" : "♡"} {post.likes.length} likes
             </button>
-            <span className="ui-muted">
+            <span className="ui-meta">
               by {post.creator.name} · <DateDisplay date={post.date} />
             </span>
           </div>

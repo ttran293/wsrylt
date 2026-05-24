@@ -11,7 +11,6 @@ import type { PostPublic } from "@/types";
 interface PostCardProps {
   post: PostPublic;
   showDelete?: boolean;
-  active?: boolean;
   onUpdated?: () => void;
   onOpen?: (post: PostPublic) => void;
 }
@@ -19,7 +18,6 @@ interface PostCardProps {
 export function PostCard({
   post,
   showDelete = false,
-  active = false,
   onUpdated,
   onOpen,
 }: PostCardProps) {
@@ -80,16 +78,12 @@ export function PostCard({
   }
 
   return (
-    <article
-      className={`ui-panel overflow-hidden transition-colors ${
-        active ? "ui-active" : ""
-      }`}
-    >
-      <div className="block w-full">
+    <article className="ui-panel flex h-full flex-col overflow-hidden transition-colors">
+      <div className="block w-full shrink-0">
         <YouTubePlayer url={post.posturl} />
       </div>
 
-      <div className="space-y-3 border-t border-[var(--border)] p-4">
+      <div className="flex flex-1 flex-col gap-4 border-t border-[var(--border)] p-5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
             {editingCaption && isOwner ? (
@@ -122,7 +116,7 @@ export function PostCard({
                 </div>
               </div>
             ) : (
-              <p className="text-sm">
+              <p className="ui-body text-[0.9375rem]">
                 {post.caption || (
                   <span className="ui-muted italic">no caption</span>
                 )}
@@ -140,14 +134,14 @@ export function PostCard({
           )}
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
+        <div className="ui-meta flex flex-wrap items-center justify-between gap-2">
           <Link href={`/user/${post.creator._id}`} className="ui-link">
             {post.creator.name}
           </Link>
           <DateDisplay date={post.date} />
         </div>
 
-        <div className="flex items-center gap-3 border-t border-[var(--border)] pt-3 text-sm">
+        <div className="mt-auto flex items-center gap-3 border-t border-[var(--border)] pt-4 text-sm">
           <button
             type="button"
             disabled={busy}

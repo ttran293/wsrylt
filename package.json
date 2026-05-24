@@ -9,6 +9,8 @@
     "start": "next start",
     "lint": "eslint",
     "db:init": "tsx scripts/init-db.ts",
+    "db:seed": "tsx scripts/seed-db.ts",
+    "db:clear": "tsx scripts/clear-db.ts",
     "db:status": "tsx scripts/db-status.ts",
     "api:check": "node scripts/check-api.mjs"
   },
@@ -21,7 +23,6 @@
     "next-auth": "^5.0.0-beta.31",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "react-player": "^3.4.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {

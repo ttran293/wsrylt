@@ -1,13 +1,4 @@
-import getYouTubeId from "get-youtube-id";
-
-export function parseYouTubeUrl(url: string): string | null {
-  const id = getYouTubeId(url);
-  return id ?? null;
-}
-
-export function toEmbedUrl(videoId: string): string {
-  return `https://www.youtube.com/embed/${videoId}`;
-}
+export { parseYouTubeUrl, toEmbedUrl } from "./youtube-utils";
 
 export interface YouTubeSearchResult {
   videoId: string;

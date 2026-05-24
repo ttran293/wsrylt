@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { YouTubePlayer } from "@/components/YouTubePlayer";
-import { parseYouTubeUrl, toEmbedUrl } from "@/lib/youtube-client";
+import { parseYouTubeUrl, toEmbedUrl } from "@/lib/youtube-utils";
 
 interface SearchResult {
   videoId: string;

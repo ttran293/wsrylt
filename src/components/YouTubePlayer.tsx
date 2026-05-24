@@ -1,4 +1,4 @@
-import { parseYouTubeUrl, toEmbedUrl } from "@/lib/youtube-client";
+import { parseYouTubeUrl, toEmbedUrl } from "@/lib/youtube-utils";
 
 interface YouTubePlayerProps {
   url: string;
@@ -17,15 +17,16 @@ export function YouTubePlayer({ url, className, autoplay }: YouTubePlayerProps) 
   }
 
   return (
-    <div className={wrapperClass}>
+    <div className={`video-frame ${wrapperClass}`}>
       <iframe
         src={toEmbedUrl(videoId, { autoplay })}
         title="YouTube video player"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
         referrerPolicy="strict-origin-when-cross-origin"
         allowFullScreen
-        className="h-full w-full border-0"
+        className="video-frame-media h-full w-full border-0"
       />
+      <div className="video-frame-overlay" aria-hidden />
     </div>
   );
 }

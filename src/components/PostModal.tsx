@@ -83,6 +83,7 @@ export function PostModal({ post, onClose, onUpdated }: PostModalProps) {
     >
       <div
         className="ui-panel max-h-[90vh] w-full max-w-2xl overflow-y-auto"
+        data-lenis-prevent
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-3">

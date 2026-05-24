@@ -145,7 +145,7 @@ export function PostForm() {
           </div>
 
           {searchResults.length > 0 && (
-            <ul className="max-h-64 space-y-2 overflow-y-auto border border-[var(--border)] p-2">
+            <ul className="max-h-64 space-y-2 overflow-y-auto border border-[var(--border)] p-2" data-lenis-prevent>
               {searchResults.map((result) => (
                 <li key={result.videoId}>
                   <button

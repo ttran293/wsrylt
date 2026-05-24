@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Fira_Code } from "next/font/google";
 import { AuthProvider } from "@/components/AuthProvider";
 import { Header } from "@/components/Header";
+import { SmoothScroll } from "@/components/SmoothScroll";
 import "./globals.css";
 
 const firaCode = Fira_Code({
@@ -29,10 +30,12 @@ export default function RootLayout({
     <html lang="en" className={`${firaCode.variable} h-full`}>
       <body className={`${firaCode.className} flex min-h-full flex-col`}>
         <AuthProvider>
-          <Header />
-          <main className="mx-auto w-full max-w-screen-2xl flex-1 px-5 py-10">
-            {children}
-          </main>
+          <SmoothScroll>
+            <Header />
+            <main className="mx-auto w-full max-w-screen-2xl flex-1 px-5 py-10">
+              {children}
+            </main>
+          </SmoothScroll>
         </AuthProvider>
       </body>
     </html>

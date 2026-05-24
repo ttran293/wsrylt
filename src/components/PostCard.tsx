@@ -83,7 +83,7 @@ export function PostCard({
         <YouTubePlayer url={post.posturl} />
       </div>
 
-      <div className="flex flex-1 flex-col gap-4 border-t border-[var(--border)] p-5">
+      <div className="flex flex-1 flex-col border-t border-[var(--border)] p-5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
             {editingCaption && isOwner ? (
@@ -134,14 +134,15 @@ export function PostCard({
           )}
         </div>
 
-        <div className="ui-meta flex flex-wrap items-center justify-between gap-2">
-          <Link href={`/user/${post.creator._id}`} className="ui-link">
-            {post.creator.name}
-          </Link>
-          <DateDisplay date={post.date} />
-        </div>
+        <div className="mt-auto">
+          <div className="ui-meta flex flex-wrap items-center justify-between gap-2 pb-3">
+            <Link href={`/user/${post.creator._id}`} className="ui-link">
+              {post.creator.name}
+            </Link>
+            <DateDisplay date={post.date} />
+          </div>
 
-        <div className="mt-auto flex items-center gap-3 border-t border-[var(--border)] pt-4 text-sm">
+          <div className="flex items-center gap-3 border-t border-[var(--border)] pt-4 text-sm">
           <button
             type="button"
             disabled={busy}
@@ -163,6 +164,7 @@ export function PostCard({
               [ delete ]
             </button>
           )}
+          </div>
         </div>
       </div>
     </article>

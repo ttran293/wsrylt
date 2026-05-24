@@ -1,5 +1,7 @@
+import { ActivityTimeline } from "@/components/ActivityTimeline";
 import { PostedBanner } from "@/components/PostedBanner";
 import { PostFeed } from "@/components/PostFeed";
+import { buildActivityFromPosts } from "@/lib/activity";
 import { getAllPosts, serializePost } from "@/lib/posts";
 import type { PostPublic } from "@/types";
 
@@ -15,6 +17,8 @@ export default async function HomePage() {
     console.error("Failed to load posts:", error);
   }
 
+  const activity = buildActivityFromPosts(posts);
+
   return (
     <div>
       <PostedBanner />
@@ -29,7 +33,10 @@ export default async function HomePage() {
         </p>
       </div>
 
-      <PostFeed initialPosts={posts} />
+      <div className="xl:grid xl:grid-cols-[minmax(0,1fr)_24rem] xl:items-start xl:gap-10">
+        <PostFeed initialPosts={posts} />
+        <ActivityTimeline events={activity} className="mt-8 xl:mt-0" />
+      </div>
     </div>
   );
 }

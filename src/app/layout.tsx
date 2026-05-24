@@ -30,7 +30,7 @@ export default function RootLayout({
       <body className={`${firaCode.className} flex min-h-full flex-col`}>
         <AuthProvider>
           <Header />
-          <main className="mx-auto w-full max-w-6xl flex-1 px-5 py-10">
+          <main className="mx-auto w-full max-w-screen-2xl flex-1 px-5 py-10">
             {children}
           </main>
         </AuthProvider>

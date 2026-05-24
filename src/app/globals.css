@@ -288,3 +288,12 @@ header .ui-link {
   color: #7ec8ff;
   text-shadow: 0 0 6px rgba(52, 144, 220, 0.25);
 }
+
+.activity-timeline {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.activity-row:last-child {
+  border-bottom: none;
+}

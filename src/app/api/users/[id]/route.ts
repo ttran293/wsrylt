@@ -1,6 +1,12 @@
 import { connectDB } from "@/lib/mongodb";
 import { User } from "@/lib/models/User";
 import { getPostsByUserId, serializePost } from "@/lib/posts";
+import {
+  getCommentsByUserId,
+  getLikesByUserId,
+  serializeUserComments,
+  serializeUserLikes,
+} from "@/lib/user-activity";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -15,7 +21,11 @@ export async function GET(_request: Request, context: RouteContext) {
       return Response.json({ error: "User not found." }, { status: 404 });
     }
 
-    const posts = await getPostsByUserId(id);
+    const [posts, rawLikes, rawComments] = await Promise.all([
+      getPostsByUserId(id),
+      getLikesByUserId(id),
+      getCommentsByUserId(id),
+    ]);
 
     return Response.json({
       user: {
@@ -25,6 +35,8 @@ export async function GET(_request: Request, context: RouteContext) {
         datejoin: user.datejoin,
       },
       posts: posts.map(serializePost),
+      likes: serializeUserLikes(rawLikes as Record<string, unknown>[]),
+      comments: serializeUserComments(rawComments as Record<string, unknown>[]),
     });
   } catch (error) {
     console.error("Get user error:", error);

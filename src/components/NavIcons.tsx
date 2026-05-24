@@ -31,3 +31,48 @@ export function NewPostIcon({ className }: IconProps) {
     </svg>
   );
 }
+
+export function PostsTabIcon({ className }: IconProps) {
+  return (
+    <svg
+      className={className}
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="currentColor"
+      aria-hidden
+    >
+      <path d="M2 2h5v5H2V2Zm7 0h5v5H9V2ZM2 9h5v5H2V9Zm7 0h5v5H9V9Z" />
+    </svg>
+  );
+}
+
+export function LikesTabIcon({ className }: IconProps) {
+  return (
+    <svg
+      className={className}
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="currentColor"
+      aria-hidden
+    >
+      <path d="M8 14s5-3.2 5-7a3 3 0 0 0-5-2.2A3 3 0 0 0 3 7c0 3.8 5 7 5 7Z" />
+    </svg>
+  );
+}
+
+export function CommentsTabIcon({ className }: IconProps) {
+  return (
+    <svg
+      className={className}
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="currentColor"
+      aria-hidden
+    >
+      <path d="M2 2h12v8H5l-3 3V2Zm1 1v8.2L5.8 10H13V3H3Z" />
+    </svg>
+  );
+}

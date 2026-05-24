@@ -184,6 +184,66 @@ body > * {
   background: color-mix(in srgb, #cfd3d3 8%, transparent);
 }
 
+.ui-profile-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0;
+  border-bottom: 1px solid #cfd3d3;
+}
+
+.ui-profile-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-bottom: -1px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  background: transparent;
+  padding: 0.5rem 0.875rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.ui-profile-tab:hover:not(.ui-profile-tab-active) {
+  background: color-mix(in srgb, var(--surface-hover) 60%, transparent);
+}
+
+.ui-profile-tab-active {
+  position: relative;
+  z-index: 1;
+  border-color: #cfd3d3;
+  background: color-mix(in srgb, var(--surface) 92%, #000000 8%);
+  color: #eeeeee;
+}
+
+.ui-profile-tab:not(.ui-profile-tab-active) {
+  color: #9a9a9a;
+}
+
+.ui-profile-tab-panel {
+  border: 1px solid #cfd3d3;
+  border-top: none;
+  background: color-mix(in srgb, var(--surface) 92%, #000000 8%);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.ui-profile-tabs .ui-profile-tab span {
+  display: inline-block;
+}
+
+.ui-profile-tabs .ui-profile-tab-active span {
+  color: #eeeeee;
+}
+
+.ui-profile-tabs .ui-profile-tab:not(.ui-profile-tab-active) span {
+  color: #9a9a9a;
+  text-shadow: none;
+}
+
 .ui-btn,
 .ui-link,
 .ui-muted,

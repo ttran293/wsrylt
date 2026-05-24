@@ -3,7 +3,13 @@ import { UserProfile } from "@/components/UserProfile";
 import { connectDB } from "@/lib/mongodb";
 import { User } from "@/lib/models/User";
 import { getPostsByUserId, serializePost } from "@/lib/posts";
-import type { PostPublic } from "@/types";
+import {
+  getCommentsByUserId,
+  getLikesByUserId,
+  serializeUserComments,
+  serializeUserLikes,
+} from "@/lib/user-activity";
+import type { PostPublic, UserCommentEntry, UserLikeEntry } from "@/types";
 
 export const dynamic = "force-dynamic";
 
@@ -22,8 +28,18 @@ export default async function UserPage({ params }: PageProps) {
       notFound();
     }
 
-    const rawPosts = await getPostsByUserId(id);
+    const [rawPosts, rawLikes, rawComments] = await Promise.all([
+      getPostsByUserId(id),
+      getLikesByUserId(id),
+      getCommentsByUserId(id),
+    ]);
     const posts = rawPosts.map(serializePost) as PostPublic[];
+    const likes = serializeUserLikes(
+      rawLikes as Record<string, unknown>[],
+    ) as UserLikeEntry[];
+    const comments = serializeUserComments(
+      rawComments as Record<string, unknown>[],
+    ) as UserCommentEntry[];
 
     return (
       <UserProfile
@@ -35,6 +51,8 @@ export default async function UserPage({ params }: PageProps) {
           datejoin: user.datejoin,
         }}
         initialPosts={posts}
+        initialLikes={likes}
+        initialComments={comments}
       />
     );
   } catch (error) {

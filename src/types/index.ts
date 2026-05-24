@@ -33,3 +33,23 @@ export interface SessionUser {
   name: string;
   email?: string;
 }
+
+export interface UserPostRef {
+  _id: string;
+  caption: string;
+  posturl: string;
+  creator: { _id: string; name: string };
+}
+
+export interface UserLikeEntry {
+  _id: string;
+  date: string;
+  post: UserPostRef;
+}
+
+export interface UserCommentEntry {
+  _id: string;
+  content: string;
+  date: string;
+  post: UserPostRef;
+}

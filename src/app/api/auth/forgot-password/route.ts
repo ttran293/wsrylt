@@ -39,17 +39,6 @@ export async function POST(request: NextRequest) {
         await sendPasswordResetEmail(email, token);
       } catch (emailError) {
         console.error("Forgot password email error:", emailError);
-        const message =
-          emailError instanceof Error ? emailError.message : "Email send failed.";
-        const isDev = process.env.NODE_ENV === "development";
-        return Response.json(
-          {
-            error: isDev
-              ? message
-              : "Could not send reset email. Please try again later.",
-          },
-          { status: 500 },
-        );
       }
     }
 

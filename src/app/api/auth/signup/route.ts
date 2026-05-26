@@ -4,6 +4,7 @@ import { formatISO } from "date-fns";
 import { z } from "zod";
 import { connectDB } from "@/lib/mongodb";
 import { User } from "@/lib/models/User";
+import { passwordSchema } from "@/lib/validation/password";
 
 const signupSchema = z.object({
   name: z.string().trim().min(1, "Username is required."),
@@ -12,7 +13,7 @@ const signupSchema = z.object({
     .trim()
     .toLowerCase()
     .email("Valid email is required."),
-  password: z.string().min(6, "Password must be at least 6 characters."),
+  password: passwordSchema,
 });
 
 export async function POST(request: NextRequest) {

@@ -5,6 +5,8 @@
  *   npm run db:seed              (remove old seed data, then insert fresh)
  *   npm run db:seed -- --clear   (remove seed data only, no re-insert)
  *
+ * Sample posts use classic tracks from Oasis, Billy Joel, and ABBA across
+ * YouTube, Spotify, and SoundCloud embed URLs.
  * All seed users share password: seed123
  */
 import { loadEnvFiles } from "./load-env";
@@ -15,6 +17,7 @@ import bcrypt from "bcryptjs";
 import { formatISO, subDays, subHours } from "date-fns";
 import mongoose from "mongoose";
 import { connectDB } from "../src/lib/mongodb";
+import { resolveMediaUrl } from "../src/lib/media";
 import { User } from "../src/lib/models/User";
 import { MusicPost } from "../src/lib/models/MusicPost";
 import { Comment } from "../src/lib/models/Comment";
@@ -53,50 +56,38 @@ const SEED_USERS = [
 const SEED_POSTS = [
   {
     creator: "alex_tapes",
-    videoId: "hT_nvWreIhg",
-    caption: "counting stars on a long night drive",
-    daysAgo: 6,
-  },
-  {
-    creator: "juns_vinyl",
-    videoId: "fJ9rUzIMcZQ",
-    caption: "bohemian rhapsody — every section hits",
+    url: "https://www.youtube.com/watch?v=bx1Bh8ZvH84",
+    caption: "oasis — wonderwall. still know every word",
     daysAgo: 5,
   },
   {
+    creator: "juns_vinyl",
+    url: "https://open.spotify.com/track/70oHMYHV2CX687WKS6yYmw",
+    caption: "billy joel — piano man. dad's road trip classic",
+    daysAgo: 4,
+  },
+  {
     creator: "mira_echo",
-    videoId: "1ti2YCFgCoI",
-    caption: "take on me because the synth never gets old",
+    url: "https://www.youtube.com/watch?v=0E1bK8Sg-Fg",
+    caption: "abba — dancing queen. friday night every time",
     daysAgo: 4,
   },
   {
     creator: "crate_diver",
-    videoId: "L_jWHffIx5E",
-    caption: "all star energy for the walk home",
+    url: "https://soundcloud.com/billyjoel/piano-man",
+    caption: "billy joel on soundcloud hits just as hard",
     daysAgo: 3,
   },
   {
     creator: "luna_tracks",
-    videoId: "kXYiU_JCYtU",
-    caption: "numb but in a nostalgic way",
-    daysAgo: 3,
-  },
-  {
-    creator: "alex_tapes",
-    videoId: "kJQP7kiw5Fk",
-    caption: "despacito — everyone knows every word",
+    url: "https://open.spotify.com/track/2TxCwUlqaOH3ITiV0R1ejP",
+    caption: "abba — mamma mia. impossible not to sing along",
     daysAgo: 2,
   },
   {
-    creator: "mira_echo",
-    videoId: "y6120QOlsfU",
-    caption: "sandstorm for focus mode",
-    daysAgo: 1,
-  },
-  {
     creator: "juns_vinyl",
-    videoId: "9bZkp7q19f0",
-    caption: "throwback party starter",
+    url: "https://www.youtube.com/watch?v=r8OipmKFDeM",
+    caption: "oasis — don't look back in anger. britpop peak",
     daysAgo: 0,
   },
 ] as const;
@@ -112,10 +103,9 @@ const SEED_LIKES: Array<{ user: string; postIndex: number }> = [
   { user: "mira_echo", postIndex: 3 },
   { user: "luna_tracks", postIndex: 3 },
   { user: "alex_tapes", postIndex: 4 },
-  { user: "crate_diver", postIndex: 5 },
-  { user: "juns_vinyl", postIndex: 6 },
-  { user: "mira_echo", postIndex: 7 },
-  { user: "alex_tapes", postIndex: 7 },
+  { user: "crate_diver", postIndex: 4 },
+  { user: "mira_echo", postIndex: 5 },
+  { user: "alex_tapes", postIndex: 5 },
 ];
 
 const SEED_COMMENTS: Array<{
@@ -127,68 +117,52 @@ const SEED_COMMENTS: Array<{
   {
     user: "mira_echo",
     postIndex: 0,
-    content: "this one always gets stuck in my head",
-    hoursAgo: 120,
+    content: "wonderwall comments aside, this song still lands",
+    hoursAgo: 96,
   },
   {
     user: "crate_diver",
     postIndex: 0,
-    content: "late night playlist essential",
-    hoursAgo: 96,
+    content: "oasis at full volume is a requirement",
+    hoursAgo: 72,
   },
   {
     user: "alex_tapes",
     postIndex: 1,
-    content: "six minutes of pure chaos, love it",
-    hoursAgo: 88,
+    content: "piano man at the bar — instant singalong",
+    hoursAgo: 64,
   },
   {
     user: "luna_tracks",
     postIndex: 2,
-    content: "that chorus is impossible not to sing",
-    hoursAgo: 72,
+    content: "abba never misses. dancing queen forever",
+    hoursAgo: 48,
   },
   {
     user: "juns_vinyl",
     postIndex: 3,
-    content: "saved this one immediately",
-    hoursAgo: 48,
+    content: "didn't expect piano man here but yes",
+    hoursAgo: 36,
   },
   {
     user: "mira_echo",
     postIndex: 4,
-    content: "high school flashbacks unlocked",
-    hoursAgo: 40,
-  },
-  {
-    user: "crate_diver",
-    postIndex: 5,
-    content: "perfect commute song",
+    content: "mamma mia unlocked a core memory",
     hoursAgo: 24,
   },
   {
-    user: "luna_tracks",
-    postIndex: 6,
-    content: "did not expect this here but I respect it",
-    hoursAgo: 12,
-  },
-  {
     user: "alex_tapes",
-    postIndex: 7,
-    content: "still goes hard in 2026",
-    hoursAgo: 6,
+    postIndex: 5,
+    content: "don't look back in anger still gives me chills",
+    hoursAgo: 8,
   },
   {
     user: "juns_vinyl",
-    postIndex: 7,
-    content: "instant dance floor",
-    hoursAgo: 3,
+    postIndex: 5,
+    content: "britpop peak right here",
+    hoursAgo: 4,
   },
 ];
-
-function embedUrl(videoId: string) {
-  return `https://www.youtube.com/embed/${videoId}`;
-}
 
 function seedUsernames() {
   return SEED_USERS.map((user) => user.name);
@@ -250,6 +224,7 @@ async function seedDatabase() {
   const hashedPassword = await bcrypt.hash(SEED_PASSWORD, 12);
   const now = new Date();
   const userByName = new Map<string, mongoose.Types.ObjectId>();
+  const providerCounts = new Map<string, number>();
 
   console.log("Creating users...");
   for (const [index, seedUser] of SEED_USERS.entries()) {
@@ -276,8 +251,13 @@ async function seedDatabase() {
       throw new Error(`Unknown seed creator: ${seedPost.creator}`);
     }
 
+    const media = await resolveMediaUrl(seedPost.url);
+    if (!media) {
+      throw new Error(`Could not resolve seed post URL: ${seedPost.url}`);
+    }
+
     const post = await MusicPost.create({
-      posturl: embedUrl(seedPost.videoId),
+      posturl: media.embedUrl,
       caption: seedPost.caption,
       creator: creatorId,
       date: formatISO(subDays(now, seedPost.daysAgo)),
@@ -287,7 +267,13 @@ async function seedDatabase() {
 
     await User.updateOne({ _id: creatorId }, { $push: { posts: post._id } });
     postIds.push(post._id);
-    console.log(`  + ${seedPost.caption.slice(0, 48)}... (${seedPost.creator})`);
+    providerCounts.set(
+      media.provider,
+      (providerCounts.get(media.provider) ?? 0) + 1,
+    );
+    console.log(
+      `  + [${media.provider}] ${seedPost.caption.slice(0, 48)}... (${seedPost.creator})`,
+    );
   }
 
   console.log("\nCreating likes...");
@@ -331,6 +317,11 @@ async function seedDatabase() {
   console.log("\nSeed complete.");
   console.log(`  users: ${SEED_USERS.length}`);
   console.log(`  posts: ${SEED_POSTS.length}`);
+  console.log(
+    `  providers: ${[...providerCounts.entries()]
+      .map(([provider, count]) => `${provider} ${count}`)
+      .join(", ")}`,
+  );
   console.log(`  likes: ${SEED_LIKES.length}`);
   console.log(`  comments: ${SEED_COMMENTS.length}`);
   console.log(`\nLogin with any seed user / password: ${SEED_PASSWORD}`);

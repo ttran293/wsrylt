@@ -6,10 +6,10 @@ import { requireAuth } from "@/lib/auth";
 import { MusicPost } from "@/lib/models/MusicPost";
 import { User } from "@/lib/models/User";
 import { getAllPosts, serializePost } from "@/lib/posts";
-import { parseYouTubeUrl, toEmbedUrl } from "@/lib/youtube";
+import { resolveMediaUrl } from "@/lib/media";
 
 const createPostSchema = z.object({
-  posturl: z.string().min(1, "YouTube URL is required."),
+  posturl: z.string().min(1, "Music URL is required."),
   caption: z.string().max(500).optional(),
 });
 
@@ -41,10 +41,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const videoId = parseYouTubeUrl(parsed.data.posturl);
-    if (!videoId) {
+    const media = await resolveMediaUrl(parsed.data.posturl);
+    if (!media) {
       return Response.json(
-        { error: "Invalid YouTube URL." },
+        {
+          error:
+            "Invalid music URL. Use a YouTube, Spotify, SoundCloud, or Bandcamp link.",
+        },
         { status: 422 },
       );
     }
@@ -57,7 +60,7 @@ export async function POST(request: NextRequest) {
     }
 
     const post = await MusicPost.create({
-      posturl: toEmbedUrl(videoId),
+      posturl: media.embedUrl,
       caption: parsed.data.caption ?? "",
       creator: auth.userId,
       date: formatISO(new Date()),

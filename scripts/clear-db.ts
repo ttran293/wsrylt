@@ -4,8 +4,12 @@
  * Usage:
  *   npm run db:clear -- --yes
  *
+ * Removes posts from every supported source (YouTube, Spotify, SoundCloud,
+ * Bandcamp) along with all users, likes, and comments.
+ *
  * Collections are kept; only documents are removed.
  * Re-run `npm run db:init` if you need indexes recreated.
+ * Re-run `npm run db:seed` to load sample multi-platform posts again.
  */
 import { loadEnvFiles } from "./load-env";
 
@@ -48,6 +52,7 @@ async function clearDatabase() {
   }
 
   console.log("\nDatabase cleared.");
+  console.log("Run `npm run db:seed` to insert fresh sample data.");
 }
 
 clearDatabase()

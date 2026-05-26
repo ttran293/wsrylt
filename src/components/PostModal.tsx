@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { DateDisplay } from "@/components/DateDisplay";
-import { YouTubePlayer } from "@/components/YouTubePlayer";
+import { MediaPlayer } from "@/components/MediaPlayer";
 import { useAuth } from "@/components/AuthProvider";
 import type { PostPublic } from "@/types";
 
@@ -94,7 +94,7 @@ export function PostModal({ post, onClose, onUpdated }: PostModalProps) {
         </div>
 
         <div className="space-y-4 p-4">
-          <YouTubePlayer url={post.posturl} />
+          <MediaPlayer url={post.posturl} />
 
           {post.caption && <p className="ui-body text-[0.9375rem]">{post.caption}</p>}
 

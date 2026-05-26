@@ -1,9 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { YouTubePlayer } from "@/components/YouTubePlayer";
-import { parseYouTubeUrl, toEmbedUrl } from "@/lib/youtube-utils";
+import { useEffect, useMemo, useState } from "react";
+import { MediaPlayer } from "@/components/MediaPlayer";
+import { isBandcampPageUrl, parseMediaUrl } from "@/lib/media";
 
 interface SearchResult {
   videoId: string;
@@ -21,12 +21,55 @@ export function PostForm() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [searching, setSearching] = useState(false);
+  const [bandcampPreview, setBandcampPreview] = useState<{
+    sourceUrl: string;
+    embedUrl: string;
+  } | null>(null);
 
   const previewUrl = selectedVideoId
-    ? toEmbedUrl(selectedVideoId)
-    : parseYouTubeUrl(url)
-      ? toEmbedUrl(parseYouTubeUrl(url)!)
-      : null;
+    ? `https://www.youtube.com/watch?v=${selectedVideoId}`
+    : url.trim() || null;
+
+  const previewPlayerUrl = useMemo(() => {
+    if (!previewUrl) return null;
+
+    if (parseMediaUrl(previewUrl)) return previewUrl;
+    if (bandcampPreview?.sourceUrl === previewUrl) {
+      return bandcampPreview.embedUrl;
+    }
+
+    return null;
+  }, [previewUrl, bandcampPreview]);
+
+  useEffect(() => {
+    if (!previewUrl || parseMediaUrl(previewUrl) || !isBandcampPageUrl(previewUrl)) {
+      return;
+    }
+
+    if (bandcampPreview?.sourceUrl === previewUrl) {
+      return;
+    }
+
+    let cancelled = false;
+
+    fetch(`/api/media/resolve?url=${encodeURIComponent(previewUrl)}`)
+      .then(async (response) => {
+        const data = await response.json();
+        if (cancelled || !response.ok || !data.embedUrl) return;
+
+        setBandcampPreview({
+          sourceUrl: previewUrl,
+          embedUrl: data.embedUrl,
+        });
+      })
+      .catch(() => {
+        if (!cancelled) setBandcampPreview(null);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [previewUrl, bandcampPreview]);
 
   async function handleSearch(event: React.FormEvent) {
     event.preventDefault();
@@ -62,9 +105,17 @@ export function PostForm() {
     event.preventDefault();
     setError("");
 
-    const videoId = selectedVideoId ?? parseYouTubeUrl(url);
-    if (!videoId) {
-      setError("Enter a valid YouTube URL or search for a song.");
+    const resolvedUrl =
+      url.trim() ||
+      (selectedVideoId
+        ? `https://www.youtube.com/watch?v=${selectedVideoId}`
+        : "");
+
+    const media = parseMediaUrl(resolvedUrl);
+    if (!media && !isBandcampPageUrl(resolvedUrl)) {
+      setError(
+        "Enter a valid YouTube, Spotify, SoundCloud, or Bandcamp link, or search YouTube for a song.",
+      );
       return;
     }
 
@@ -74,7 +125,7 @@ export function PostForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          posturl: url || `https://www.youtube.com/watch?v=${videoId}`,
+          posturl: resolvedUrl,
           caption,
         }),
       });
@@ -99,13 +150,14 @@ export function PostForm() {
       <div className="ui-panel p-6">
         <h1 className="ui-title text-2xl font-medium">share a song</h1>
         <p className="ui-muted mt-2 text-sm">
-          paste a youtube link or search by keyword.
+          paste a youtube, spotify, soundcloud, or bandcamp link, or search
+          youtube by keyword.
         </p>
 
         <div className="mt-6 space-y-4">
           <div>
             <label htmlFor="url" className="block text-sm">
-              youtube url
+              music url
             </label>
             <input
               id="url"
@@ -115,7 +167,7 @@ export function PostForm() {
                 setUrl(e.target.value);
                 setSelectedVideoId(null);
               }}
-              placeholder="https://www.youtube.com/watch?v=..."
+              placeholder="soundcloud.com/... bandcamp.com/track/... spotify.com/track/..."
               className="ui-input mt-1"
             />
           </div>
@@ -199,10 +251,10 @@ export function PostForm() {
         </div>
       </div>
 
-      {previewUrl && (
+      {previewPlayerUrl && (
         <div className="ui-panel p-4">
           <h2 className="ui-muted mb-3 text-sm">preview</h2>
-          <YouTubePlayer url={previewUrl} />
+          <MediaPlayer url={previewPlayerUrl} />
         </div>
       )}
     </form>

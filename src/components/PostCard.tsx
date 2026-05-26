@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { DateDisplay } from "@/components/DateDisplay";
-import { YouTubePlayer } from "@/components/YouTubePlayer";
+import { MediaPlayer } from "@/components/MediaPlayer";
 import { useAuth } from "@/components/AuthProvider";
 import type { PostPublic } from "@/types";
 
@@ -80,7 +80,7 @@ export function PostCard({
   return (
     <article className="ui-panel flex h-full flex-col overflow-hidden transition-colors">
       <div className="block w-full shrink-0">
-        <YouTubePlayer url={post.posturl} />
+        <MediaPlayer url={post.posturl} />
       </div>
 
       <div className="flex flex-1 flex-col border-t border-[var(--border)] p-5">

@@ -56,31 +56,31 @@ const SEED_USERS = [
 const SEED_POSTS = [
   {
     creator: "alex_tapes",
-    url: "https://www.youtube.com/watch?v=bx1Bh8ZvH84",
+    url: "https://www.youtube.com/watch?v=FVdjZYfDuLE",
     caption: "oasis — wonderwall. still know every word",
     daysAgo: 5,
   },
   {
     creator: "juns_vinyl",
-    url: "https://open.spotify.com/track/70oHMYHV2CX687WKS6yYmw",
+    url: "https://open.spotify.com/track/1jEtkYYymmFGKEDLZ7ZisR",
     caption: "billy joel — piano man. dad's road trip classic",
     daysAgo: 4,
   },
   {
     creator: "mira_echo",
-    url: "https://www.youtube.com/watch?v=0E1bK8Sg-Fg",
+    url: "https://www.youtube.com/watch?v=k2bBTWvmN-8",
     caption: "abba — dancing queen. friday night every time",
     daysAgo: 4,
   },
   {
     creator: "crate_diver",
-    url: "https://soundcloud.com/billyjoel/piano-man",
-    caption: "billy joel on soundcloud hits just as hard",
+    url: "https://soundcloud.com/abba-official/dancing-queen",
+    caption: "abba on soundcloud hits just as hard",
     daysAgo: 3,
   },
   {
     creator: "luna_tracks",
-    url: "https://open.spotify.com/track/2TxCwUlqaOH3ITiV0R1ejP",
+    url: "https://open.spotify.com/track/2TxCwUlqaOH3TIyJqGgR91",
     caption: "abba — mamma mia. impossible not to sing along",
     daysAgo: 2,
   },
@@ -141,7 +141,7 @@ const SEED_COMMENTS: Array<{
   {
     user: "juns_vinyl",
     postIndex: 3,
-    content: "didn't expect piano man here but yes",
+    content: "abba on soundcloud — did not expect this here but yes",
     hoursAgo: 36,
   },
   {

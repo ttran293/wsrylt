@@ -21,10 +21,12 @@ import { User } from "../src/lib/models/User";
 import { MusicPost } from "../src/lib/models/MusicPost";
 import { Comment } from "../src/lib/models/Comment";
 import { Like } from "../src/lib/models/Like";
+import { PasswordResetToken } from "../src/lib/models/PasswordResetToken";
 
 type ClearableModel = Model<unknown>;
 
 const collections: { name: string; model: ClearableModel }[] = [
+  { name: "passwordresettokens", model: PasswordResetToken },
   { name: "comments", model: Comment },
   { name: "likes", model: Like },
   { name: "musicposts", model: MusicPost },

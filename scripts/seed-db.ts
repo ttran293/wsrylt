@@ -8,6 +8,9 @@
  * Sample posts use classic tracks from Oasis, Billy Joel, and ABBA across
  * YouTube, Spotify, and SoundCloud embed URLs.
  * All seed users share password: seed123
+ *
+ * Seed emails use @example.com only. To test password reset, sign up at
+ * /signup with your own email (Resend test mode sends to your verified address).
  */
 import { loadEnvFiles } from "./load-env";
 
@@ -239,7 +242,7 @@ async function seedDatabase() {
       likes: [],
     });
     userByName.set(seedUser.name, created._id);
-    console.log(`  + ${seedUser.name}`);
+    console.log(`  + ${seedUser.name} (${seedUser.email})`);
   }
 
   const postIds: mongoose.Types.ObjectId[] = [];
@@ -326,6 +329,7 @@ async function seedDatabase() {
   console.log(`  comments: ${SEED_COMMENTS.length}`);
   console.log(`\nLogin with any seed user / password: ${SEED_PASSWORD}`);
   console.log(`  e.g. ${SEED_USERS[0].name}`);
+  console.log("\nPassword reset: sign up at /signup with your own email to test.");
 }
 
 seedDatabase()

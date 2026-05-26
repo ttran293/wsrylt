@@ -3,7 +3,7 @@ import { auth } from "@/auth";
 export interface AuthUser {
   userId: string;
   name: string;
-  email?: string;
+  email: string;
 }
 
 export async function getSessionUser(): Promise<AuthUser | null> {
@@ -15,7 +15,7 @@ export async function getSessionUser(): Promise<AuthUser | null> {
   return {
     userId: session.user.id,
     name: session.user.name ?? "",
-    email: session.user.email ?? undefined,
+    email: session.user.email ?? "",
   };
 }
 

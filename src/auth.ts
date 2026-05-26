@@ -29,7 +29,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
 
         await connectDB();
-        const user = await User.findOne({ name: name.trim() });
+        const identifier = name.trim();
+        const user =
+          (await User.findOne({ name: identifier })) ??
+          (identifier.includes("@")
+            ? await User.findOne({ email: identifier.toLowerCase() })
+            : null);
 
         if (!user) {
           return null;

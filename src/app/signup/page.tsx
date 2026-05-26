@@ -14,6 +14,8 @@ export default function SignupPage() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
+  const emailValid = email.trim().length > 0 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+
   const passwordValid =
     password.length >= 6 &&
     /[A-Z]/.test(password) &&
@@ -94,11 +96,12 @@ export default function SignupPage() {
 
           <div>
             <label htmlFor="email" className="block text-sm">
-              email (optional)
+              email
             </label>
             <input
               id="email"
               type="email"
+              required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="ui-input mt-1"
@@ -162,7 +165,7 @@ export default function SignupPage() {
 
           <button
             type="submit"
-            disabled={busy || !passwordValid}
+            disabled={busy || !emailValid || !passwordValid}
             className="ui-btn ui-btn-accent w-full"
           >
             {busy ? "[ creating account... ]" : "[ sign up ]"}

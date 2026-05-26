@@ -1,7 +1,7 @@
 export interface UserPublic {
   _id: string;
   name: string;
-  email?: string;
+  email: string;
   information?: string;
   datejoin?: string;
 }
@@ -31,7 +31,7 @@ export interface PostPublic {
 export interface SessionUser {
   userId: string;
   name: string;
-  email?: string;
+  email: string;
 }
 
 export interface UserPostRef {

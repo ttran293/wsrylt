@@ -7,7 +7,11 @@ import { User } from "@/lib/models/User";
 
 const signupSchema = z.object({
   name: z.string().trim().min(1, "Username is required."),
-  email: z.string().email().optional().or(z.literal("")),
+  email: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .email("Valid email is required."),
   password: z.string().min(6, "Password must be at least 6 characters."),
 });
 
@@ -35,10 +39,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const existingEmail = await User.findOne({ email });
+    if (existingEmail) {
+      return Response.json(
+        { error: "Email already in use. Choose a different email." },
+        { status: 422 },
+      );
+    }
+
     const hashedPassword = await bcrypt.hash(password, 12);
     const createdUser = await User.create({
       name,
-      email: email || undefined,
+      email,
       password: hashedPassword,
       information: "",
       datejoin: formatISO(new Date()),

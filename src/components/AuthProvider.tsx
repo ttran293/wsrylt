@@ -14,7 +14,7 @@ export function useAuth() {
     ? {
         userId: session.user.id,
         name: session.user.name ?? "",
-        email: session.user.email ?? undefined,
+        email: session.user.email ?? "",
       }
     : null;
 

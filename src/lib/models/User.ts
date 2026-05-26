@@ -2,7 +2,7 @@ import mongoose, { Schema, type InferSchemaType, type Model } from "mongoose";
 
 const UserSchema = new Schema({
   name: { type: String, required: true, unique: true },
-  email: { type: String },
+  email: { type: String, required: true, unique: true, lowercase: true, trim: true },
   information: { type: String, maxlength: 150, default: "" },
   datejoin: { type: String, required: true },
   password: { type: String, required: true, minlength: 6 },

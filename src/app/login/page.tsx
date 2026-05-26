@@ -1,12 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const resetSuccess = searchParams.get("reset") === "success";
+
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -25,7 +28,7 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
-        setError("Invalid credentials. Could not log you in.");
+        setError("uh oh ~ we could not log you in");
         return;
       }
 
@@ -47,9 +50,16 @@ export default function LoginPage() {
         </p>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+          {resetSuccess && (
+            <p className="ui-banner px-3 py-2 text-sm">
+              Password updated. Sign in with your username or email and new
+              password.
+            </p>
+          )}
+
           <div>
             <label htmlFor="name" className="block text-sm">
-              username
+              username or email
             </label>
             <input
               id="name"
@@ -75,6 +85,12 @@ export default function LoginPage() {
             />
           </div>
 
+          <p className="text-right text-sm">
+            <Link href="/forgot-password" className="ui-link">
+              forgot password?
+            </Link>
+          </p>
+
           {error && (
             <p className="border border-red-400/50 bg-red-950/30 px-3 py-2 text-sm text-red-300">
               {error}
@@ -98,5 +114,13 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="mx-auto max-w-md ui-panel p-8">loading...</div>}>
+      <LoginForm />
+    </Suspense>
   );
 }

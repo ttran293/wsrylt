@@ -1,5 +1,5 @@
 /**
- * Delete all app data from MongoDB (users, posts, likes, comments).
+ * Delete all app data from MongoDB (users, posts, likes, comments, notifications).
  *
  * Usage:
  *   npm run db:clear -- --yes
@@ -21,11 +21,13 @@ import { User } from "../src/lib/models/User";
 import { MusicPost } from "../src/lib/models/MusicPost";
 import { Comment } from "../src/lib/models/Comment";
 import { Like } from "../src/lib/models/Like";
+import { Notification } from "../src/lib/models/Notification";
 import { PasswordResetToken } from "../src/lib/models/PasswordResetToken";
 
 type ClearableModel = Model<unknown>;
 
 const collections: { name: string; model: ClearableModel }[] = [
+  { name: "notifications", model: Notification },
   { name: "passwordresettokens", model: PasswordResetToken },
   { name: "comments", model: Comment },
   { name: "likes", model: Like },
@@ -36,7 +38,7 @@ const collections: { name: string; model: ClearableModel }[] = [
 async function clearDatabase() {
   const confirmed = process.argv.slice(2).includes("--yes");
   if (!confirmed) {
-    console.error("This deletes ALL users, posts, likes, and comments.");
+    console.error("This deletes ALL users, posts, likes, comments, and notifications.");
     console.error("Run: npm run db:clear -- --yes");
     process.exit(1);
   }

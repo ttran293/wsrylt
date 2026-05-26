@@ -13,12 +13,16 @@ import { User } from "../src/lib/models/User";
 import { MusicPost } from "../src/lib/models/MusicPost";
 import { Comment } from "../src/lib/models/Comment";
 import { Like } from "../src/lib/models/Like";
+import { Notification } from "../src/lib/models/Notification";
+import { PasswordResetToken } from "../src/lib/models/PasswordResetToken";
 
 const models = [
   { name: "users", model: User },
   { name: "musicposts", model: MusicPost },
   { name: "comments", model: Comment },
   { name: "likes", model: Like },
+  { name: "notifications", model: Notification },
+  { name: "passwordresettokens", model: PasswordResetToken },
 ] as const;
 
 async function initDatabase() {

@@ -15,6 +15,7 @@ export function PostForm() {
   const router = useRouter();
   const [url, setUrl] = useState("");
   const [caption, setCaption] = useState("");
+  const [tags, setTags] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
@@ -127,6 +128,7 @@ export function PostForm() {
         body: JSON.stringify({
           posturl: resolvedUrl,
           caption,
+          tags,
         }),
       });
 
@@ -231,6 +233,20 @@ export function PostForm() {
               rows={3}
               maxLength={500}
               placeholder="why do you love this song?"
+              className="ui-input mt-1"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="tags" className="block text-sm">
+              tags (optional)
+            </label>
+            <input
+              id="tags"
+              type="text"
+              value={tags}
+              onChange={(e) => setTags(e.target.value)}
+              placeholder="jazz, chill, late-night (up to 5)"
               className="ui-input mt-1"
             />
           </div>

@@ -101,6 +101,52 @@ body > * {
   background: color-mix(in srgb, var(--accent) 12%, transparent);
 }
 
+.ui-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  border: 1px solid var(--border);
+  background: transparent;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.8125rem;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.ui-tag-label,
+.ui-tag-count {
+  display: inline;
+  font-family: inherit;
+  letter-spacing: inherit;
+  text-shadow: none;
+}
+
+.ui-tag-count {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.ui-tag-count::before {
+  content: "·";
+  margin: 0 0.2rem;
+  color: color-mix(in srgb, var(--muted) 70%, transparent);
+}
+
+.ui-tag-link {
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.ui-tag-link:hover {
+  background: var(--surface-hover);
+  border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
+}
+
+.ui-tag-active {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
 .ui-input {
   width: 100%;
   border: 1px solid var(--border);
@@ -287,6 +333,17 @@ main :where(h1, h2) {
 .ui-banner,
 header :where(button, span:not(.ui-separator), a:not(.ui-nav-tab)) {
   display: inline-block;
+}
+
+.ui-tag,
+.ui-tag-label,
+.ui-tag-count {
+  text-shadow: none;
+}
+
+.ui-tag-label,
+.ui-tag-count {
+  display: inline;
 }
 
 .ui-body {

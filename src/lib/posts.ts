@@ -13,13 +13,32 @@ const postPopulate = [
   },
 ];
 
-export async function getAllPosts() {
+export async function getAllPosts(tag?: string) {
   await import("@/lib/mongodb").then(({ connectDB }) => connectDB());
-  return MusicPost.find()
+
+  const filter = tag ? { tags: tag } : {};
+
+  return MusicPost.find(filter)
     .populate(postPopulate)
     .sort({ _id: -1 })
     .lean()
     .exec();
+}
+
+export async function getTagCounts(limit = 30) {
+  await import("@/lib/mongodb").then(({ connectDB }) => connectDB());
+
+  const results = await MusicPost.aggregate<{ _id: string; count: number }>([
+    { $unwind: "$tags" },
+    { $group: { _id: "$tags", count: { $sum: 1 } } },
+    { $sort: { count: -1, _id: 1 } },
+    { $limit: limit },
+  ]);
+
+  return results.map((item) => ({
+    tag: item._id,
+    count: item.count,
+  }));
 }
 
 export async function getPostsByUserId(userId: string) {

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { DateDisplay } from "@/components/DateDisplay";
 import { MediaPlayer } from "@/components/MediaPlayer";
+import { TagList } from "@/components/TagList";
 import { useAuth } from "@/components/AuthProvider";
 import type { PostPublic } from "@/types";
 
@@ -13,6 +14,7 @@ interface PostCardProps {
   showDelete?: boolean;
   onUpdated?: () => void;
   onOpen?: (post: PostPublic) => void;
+  onTagClick?: (tag: string) => void;
 }
 
 export function PostCard({
@@ -20,10 +22,12 @@ export function PostCard({
   showDelete = false,
   onUpdated,
   onOpen,
+  onTagClick,
 }: PostCardProps) {
   const { user } = useAuth();
   const router = useRouter();
   const [caption, setCaption] = useState(post.caption);
+  const [tagInput, setTagInput] = useState((post.tags ?? []).join(", "));
   const [editingCaption, setEditingCaption] = useState(false);
   const [busy, setBusy] = useState(false);
 
@@ -57,7 +61,7 @@ export function PostCard({
       await fetch(`/api/posts/${post._id}/caption`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ caption }),
+        body: JSON.stringify({ caption, tags: tagInput }),
       });
       setEditingCaption(false);
       onUpdated?.();
@@ -94,6 +98,13 @@ export function PostCard({
                   className="ui-input"
                   rows={2}
                 />
+                <input
+                  type="text"
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  placeholder="tags: jazz, chill, late-night"
+                  className="ui-input"
+                />
                 <div className="flex gap-2">
                   <button
                     type="button"
@@ -107,6 +118,7 @@ export function PostCard({
                     type="button"
                     onClick={() => {
                       setCaption(post.caption);
+                      setTagInput((post.tags ?? []).join(", "));
                       setEditingCaption(false);
                     }}
                     className="ui-btn"
@@ -133,6 +145,14 @@ export function PostCard({
             </button>
           )}
         </div>
+
+        {!editingCaption && (
+          <TagList
+            tags={post.tags ?? []}
+            onTagClick={onTagClick}
+            className="mt-3"
+          />
+        )}
 
         <div className="mt-auto">
           <div className="ui-meta flex flex-wrap items-center justify-between gap-2 pb-3">

@@ -3,11 +3,13 @@ import { z } from "zod";
 import { connectDB } from "@/lib/mongodb";
 import { requireAuth } from "@/lib/auth";
 import { MusicPost } from "@/lib/models/MusicPost";
+import { tagsSchema } from "@/lib/validation/tags";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
 const captionSchema = z.object({
   caption: z.string().max(500),
+  tags: tagsSchema.optional(),
 });
 
 export async function PATCH(request: NextRequest, context: RouteContext) {
@@ -41,12 +43,16 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     }
 
     post.caption = parsed.data.caption;
+    if (parsed.data.tags !== undefined) {
+      post.tags = parsed.data.tags;
+    }
     await post.save();
 
     return Response.json({
       message: "Caption edited.",
       status: "200",
       caption: parsed.data.caption,
+      tags: post.tags,
     });
   } catch (error) {
     console.error("Edit caption error:", error);

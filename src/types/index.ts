@@ -22,10 +22,16 @@ export interface PostPublic {
   _id: string;
   posturl: string;
   caption: string;
+  tags: string[];
   date: string;
   creator: UserPublic;
   comments: CommentPublic[];
   likes: LikePublic[];
+}
+
+export interface TagCount {
+  tag: string;
+  count: number;
 }
 
 export interface SessionUser {

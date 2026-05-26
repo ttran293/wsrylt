@@ -7,14 +7,28 @@ import { MusicPost } from "@/lib/models/MusicPost";
 import { User } from "@/lib/models/User";
 import { getAllPosts, serializePost } from "@/lib/posts";
 import { resolveMediaUrl } from "@/lib/media";
+import { tagsSchema, normalizeTag } from "@/lib/validation/tags";
 
 const createPostSchema = z.object({
   posturl: z.string().min(1, "Music URL is required."),
   caption: z.string().max(500).optional(),
+  tags: tagsSchema,
 });
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const rawTag = request.nextUrl.searchParams.get("tag");
+
+    if (rawTag) {
+      const tag = normalizeTag(rawTag);
+      if (!tag) {
+        return Response.json([]);
+      }
+
+      const posts = await getAllPosts(tag);
+      return Response.json(posts.map(serializePost));
+    }
+
     const posts = await getAllPosts();
     return Response.json(posts.map(serializePost));
   } catch (error) {
@@ -62,6 +76,7 @@ export async function POST(request: NextRequest) {
     const post = await MusicPost.create({
       posturl: media.embedUrl,
       caption: parsed.data.caption ?? "",
+      tags: parsed.data.tags,
       creator: auth.userId,
       date: formatISO(new Date()),
       comments: [],

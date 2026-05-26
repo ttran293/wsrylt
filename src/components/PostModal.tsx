@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { DateDisplay } from "@/components/DateDisplay";
 import { MediaPlayer } from "@/components/MediaPlayer";
+import { TagList } from "@/components/TagList";
 import { useAuth } from "@/components/AuthProvider";
 import type { PostPublic } from "@/types";
 
@@ -11,9 +12,10 @@ interface PostModalProps {
   post: PostPublic;
   onClose: () => void;
   onUpdated: () => void;
+  onTagClick?: (tag: string) => void;
 }
 
-export function PostModal({ post, onClose, onUpdated }: PostModalProps) {
+export function PostModal({ post, onClose, onUpdated, onTagClick }: PostModalProps) {
   const { user } = useAuth();
   const router = useRouter();
   const [comment, setComment] = useState("");
@@ -97,6 +99,14 @@ export function PostModal({ post, onClose, onUpdated }: PostModalProps) {
           <MediaPlayer url={post.posturl} />
 
           {post.caption && <p className="ui-body text-[0.9375rem]">{post.caption}</p>}
+
+          <TagList
+            tags={post.tags ?? []}
+            onTagClick={(tag) => {
+              onTagClick?.(tag);
+              onClose();
+            }}
+          />
 
           <div className="flex flex-wrap items-center gap-4 text-sm">
             <button

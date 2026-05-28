@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
+import { NotificationsMenu } from "@/components/NotificationsMenu";
 import { HomeIcon, NewPostIcon } from "@/components/NavIcons";
 
 export function Header() {
@@ -15,7 +16,7 @@ export function Header() {
   }
 
   return (
-    <header className="crt-bg sticky top-0 z-40 border-b border-[var(--border)]">
+    <header className="crt-bg sticky top-0 z-40 border-b border-border">
       <div className="mx-auto flex max-w-screen-2xl flex-wrap items-center gap-x-2 gap-y-3 px-4 py-3 text-sm">
         <nav className="flex items-center gap-2">
           <Link href="/" className={navTabClass("/")}>
@@ -36,6 +37,8 @@ export function Header() {
               <Link href={`/user/${user.userId}`} className="ui-link">
                 {user.name}
               </Link>
+              <span className="ui-separator">|</span>
+              <NotificationsMenu />
               <span className="ui-separator">|</span>
               <button type="button" onClick={() => logout()} className="ui-btn">
                 [ log out ]

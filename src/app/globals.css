@@ -189,6 +189,68 @@ body > * {
   background: color-mix(in srgb, var(--accent) 8%, var(--surface));
 }
 
+.notification-trigger {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2rem;
+  padding-inline: 0.6rem;
+}
+
+.notification-icon {
+  display: block;
+  width: 1rem;
+  height: 1rem;
+}
+
+.notification-badge {
+  display: inline-flex;
+  min-width: 1.15rem;
+  height: 1.15rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 22%, #000000);
+  color: #eeeeee;
+  font-size: 0.6875rem;
+  line-height: 1;
+}
+
+.notification-menu {
+  position: absolute;
+  top: calc(100% + 0.55rem);
+  right: 0;
+  z-index: 60;
+  width: min(24rem, calc(100vw - 2rem));
+  overflow: hidden;
+}
+
+.notification-item {
+  display: flex;
+  gap: 0.75rem;
+  border-bottom: 1px solid var(--border);
+  padding: 0.875rem;
+}
+
+.notification-item:last-child {
+  border-bottom: none;
+}
+
+.notification-item-unread {
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
+.notification-dot {
+  margin-top: 0.35rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  flex: 0 0 auto;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  box-shadow: 0 0 8px rgba(52, 144, 220, 0.45);
+}
+
 @keyframes tab-icon-bop {
   0% {
     transform: translateY(0);

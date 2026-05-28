@@ -76,3 +76,18 @@ export function CommentsTabIcon({ className }: IconProps) {
     </svg>
   );
 }
+
+export function BellIcon({ className }: IconProps) {
+  return (
+    <svg
+      className={className}
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="currentColor"
+      aria-hidden
+    >
+      <path d="M8 15a2 2 0 0 0 1.9-1.4H6.1A2 2 0 0 0 8 15ZM3 12.5h10l-1.4-2V7a3.6 3.6 0 0 0-2.8-3.5V2a.8.8 0 0 0-1.6 0v1.5A3.6 3.6 0 0 0 4.4 7v3.5L3 12.5Zm2.6-1V7A2.4 2.4 0 0 1 8 4.6 2.4 2.4 0 0 1 10.4 7v4.5H5.6Z" />
+    </svg>
+  );
+}

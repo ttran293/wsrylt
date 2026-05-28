@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/mongodb";
 import { requireAuth } from "@/lib/auth";
 import { Like } from "@/lib/models/Like";
 import { MusicPost } from "@/lib/models/MusicPost";
+import { Notification } from "@/lib/models/Notification";
 import { User } from "@/lib/models/User";
 
 type RouteContext = {
@@ -36,6 +37,11 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
     });
     await MusicPost.findByIdAndUpdate(id, {
       $pull: { likes: likeId },
+    });
+    await Notification.deleteMany({
+      actor: auth.userId,
+      type: "like",
+      post: id,
     });
 
     return Response.json({ message: "Like removed.", status: "200" });

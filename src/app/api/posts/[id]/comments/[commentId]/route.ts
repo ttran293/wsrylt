@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/mongodb";
 import { requireAuth } from "@/lib/auth";
 import { Comment } from "@/lib/models/Comment";
 import { MusicPost } from "@/lib/models/MusicPost";
+import { Notification } from "@/lib/models/Notification";
 import { User } from "@/lib/models/User";
 
 type RouteContext = {
@@ -36,6 +37,10 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
     });
     await MusicPost.findByIdAndUpdate(id, {
       $pull: { comments: commentId },
+    });
+    await Notification.deleteMany({
+      comment: commentId,
+      type: "comment",
     });
 
     return Response.json({ message: "Comment deleted.", status: "200" });

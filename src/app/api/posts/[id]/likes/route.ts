@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/mongodb";
 import { requireAuth } from "@/lib/auth";
 import { Like } from "@/lib/models/Like";
 import { MusicPost } from "@/lib/models/MusicPost";
+import { Notification } from "@/lib/models/Notification";
 import { User } from "@/lib/models/User";
 
 type RouteContext = { params: Promise<{ id: string }> };
@@ -47,7 +48,20 @@ export async function POST(request: NextRequest, context: RouteContext) {
 
     user.likes.push(like._id);
     post.likes.push(like._id);
-    await Promise.all([user.save(), post.save()]);
+
+    const writes: Promise<unknown>[] = [user.save(), post.save()];
+    if (post.creator.toString() !== auth.userId) {
+      writes.push(
+        Notification.create({
+          recipient: post.creator,
+          actor: auth.userId,
+          type: "like",
+          post: id,
+        }),
+      );
+    }
+
+    await Promise.all(writes);
 
     return Response.json({
       message: "Like added.",

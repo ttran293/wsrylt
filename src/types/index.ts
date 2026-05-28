@@ -34,6 +34,27 @@ export interface TagCount {
   count: number;
 }
 
+export interface NotificationPublic {
+  _id: string;
+  type: "like" | "comment";
+  read: boolean;
+  createdAt: string;
+  actor: { _id: string; name: string };
+  post: {
+    _id: string;
+    caption: string;
+    posturl: string;
+  };
+  comment?: {
+    _id: string;
+    content: string;
+  };
+}
+
+export interface NotificationSummary {
+  unreadCount: number;
+}
+
 export interface SessionUser {
   userId: string;
   name: string;

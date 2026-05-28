@@ -6,6 +6,7 @@ import { MusicPost } from "@/lib/models/MusicPost";
 import { User } from "@/lib/models/User";
 import { Comment } from "@/lib/models/Comment";
 import { Like } from "@/lib/models/Like";
+import { Notification } from "@/lib/models/Notification";
 import { getPostById, serializePost } from "@/lib/posts";
 
 type RouteContext = { params: Promise<{ id: string }> };
@@ -50,6 +51,12 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
     session.startTransaction();
 
     try {
+      const [commentIds, likeIds] = await Promise.all([
+        Comment.find({ onPost: id }).distinct("_id").session(session),
+        Like.find({ toPost: id }).distinct("_id").session(session),
+      ]);
+
+      await Notification.deleteMany({ post: id }, { session });
       await Comment.deleteMany({ onPost: id }, { session });
       await Like.deleteMany({ toPost: id }, { session });
 
@@ -58,7 +65,8 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
         {
           $pull: {
             posts: id,
-            likes: { $in: await Like.find({ toPost: id }).distinct("_id") },
+            comments: { $in: commentIds },
+            likes: { $in: likeIds },
           },
         },
         { session },

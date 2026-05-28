@@ -5,6 +5,7 @@ import { connectDB } from "@/lib/mongodb";
 import { requireAuth } from "@/lib/auth";
 import { MusicPost } from "@/lib/models/MusicPost";
 import { Comment } from "@/lib/models/Comment";
+import { Notification } from "@/lib/models/Notification";
 import { User } from "@/lib/models/User";
 
 type RouteContext = { params: Promise<{ id: string }> };
@@ -50,7 +51,21 @@ export async function POST(request: NextRequest, context: RouteContext) {
 
     commenter.comments.push(comment._id);
     post.comments.push(comment._id);
-    await Promise.all([commenter.save(), post.save()]);
+
+    const writes: Promise<unknown>[] = [commenter.save(), post.save()];
+    if (post.creator.toString() !== auth.userId) {
+      writes.push(
+        Notification.create({
+          recipient: post.creator,
+          actor: auth.userId,
+          type: "comment",
+          post: id,
+          comment: comment._id,
+        }),
+      );
+    }
+
+    await Promise.all(writes);
 
     return Response.json({
       message: "Comment added.",

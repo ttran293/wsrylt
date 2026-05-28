@@ -1,5 +1,5 @@
 /**
- * Seed synthetic users, posts, likes, and comments.
+ * Seed synthetic users, posts, likes, comments, and notifications.
  *
  * Usage:
  *   npm run db:seed              (remove old seed data, then insert fresh)
@@ -25,6 +25,7 @@ import { User } from "../src/lib/models/User";
 import { MusicPost } from "../src/lib/models/MusicPost";
 import { Comment } from "../src/lib/models/Comment";
 import { Like } from "../src/lib/models/Like";
+import { Notification } from "../src/lib/models/Notification";
 
 const SEED_PASSWORD = "seed123";
 
@@ -190,8 +191,21 @@ async function clearSeedData() {
   const posts = await MusicPost.find({ creator: { $in: userIds } }).select("_id");
   const postIds = posts.map((post) => post._id);
 
-  const [deletedComments, deletedLikes, deletedPosts, deletedUsers] =
+  const [
+    deletedNotifications,
+    deletedComments,
+    deletedLikes,
+    deletedPosts,
+    deletedUsers,
+  ] =
     await Promise.all([
+      Notification.deleteMany({
+        $or: [
+          { recipient: { $in: userIds } },
+          { actor: { $in: userIds } },
+          { post: { $in: postIds } },
+        ],
+      }),
       Comment.deleteMany({
         $or: [{ byUser: { $in: userIds } }, { onPost: { $in: postIds } }],
       }),
@@ -207,6 +221,7 @@ async function clearSeedData() {
   console.log(`  posts: ${deletedPosts.deletedCount}`);
   console.log(`  likes: ${deletedLikes.deletedCount}`);
   console.log(`  comments: ${deletedComments.deletedCount}`);
+  console.log(`  notifications: ${deletedNotifications.deletedCount}`);
 }
 
 async function seedDatabase() {
@@ -252,6 +267,7 @@ async function seedDatabase() {
   }
 
   const postIds: mongoose.Types.ObjectId[] = [];
+  const postCreatorIds: mongoose.Types.ObjectId[] = [];
 
   console.log("\nCreating posts...");
   for (const seedPost of SEED_POSTS) {
@@ -277,6 +293,7 @@ async function seedDatabase() {
 
     await User.updateOne({ _id: creatorId }, { $push: { posts: post._id } });
     postIds.push(post._id);
+    postCreatorIds.push(creatorId);
     providerCounts.set(
       media.provider,
       (providerCounts.get(media.provider) ?? 0) + 1,
@@ -287,6 +304,7 @@ async function seedDatabase() {
   }
 
   console.log("\nCreating likes...");
+  let likeNotificationCount = 0;
   for (const seedLike of SEED_LIKES) {
     const userId = userByName.get(seedLike.user);
     const postId = postIds[seedLike.postIndex];
@@ -301,10 +319,24 @@ async function seedDatabase() {
       User.updateOne({ _id: userId }, { $push: { likes: like._id } }),
       MusicPost.updateOne({ _id: postId }, { $push: { likes: like._id } }),
     ]);
+
+    const recipientId = postCreatorIds[seedLike.postIndex];
+    if (recipientId && !recipientId.equals(userId)) {
+      await Notification.create({
+        recipient: recipientId,
+        actor: userId,
+        type: "like",
+        post: postId,
+        read: likeNotificationCount % 3 === 0,
+        createdAt: subHours(now, 12 + likeNotificationCount),
+      });
+      likeNotificationCount++;
+    }
   }
   console.log(`  + ${SEED_LIKES.length} likes`);
 
   console.log("\nCreating comments...");
+  let commentNotificationCount = 0;
   for (const seedComment of SEED_COMMENTS) {
     const userId = userByName.get(seedComment.user);
     const postId = postIds[seedComment.postIndex];
@@ -321,8 +353,25 @@ async function seedDatabase() {
       User.updateOne({ _id: userId }, { $push: { comments: comment._id } }),
       MusicPost.updateOne({ _id: postId }, { $push: { comments: comment._id } }),
     ]);
+
+    const recipientId = postCreatorIds[seedComment.postIndex];
+    if (recipientId && !recipientId.equals(userId)) {
+      await Notification.create({
+        recipient: recipientId,
+        actor: userId,
+        type: "comment",
+        post: postId,
+        comment: comment._id,
+        read: commentNotificationCount % 4 === 0,
+        createdAt: subHours(now, seedComment.hoursAgo),
+      });
+      commentNotificationCount++;
+    }
   }
   console.log(`  + ${SEED_COMMENTS.length} comments`);
+  console.log(
+    `  + ${likeNotificationCount + commentNotificationCount} notifications`,
+  );
 
   console.log("\nSeed complete.");
   console.log(`  users: ${SEED_USERS.length}`);
@@ -334,6 +383,7 @@ async function seedDatabase() {
   );
   console.log(`  likes: ${SEED_LIKES.length}`);
   console.log(`  comments: ${SEED_COMMENTS.length}`);
+  console.log(`  notifications: ${likeNotificationCount + commentNotificationCount}`);
   console.log(`\nLogin with any seed user / password: ${SEED_PASSWORD}`);
   console.log(`  e.g. ${SEED_USERS[0].name}`);
   console.log("\nPassword reset: sign up at /signup with your own email to test.");

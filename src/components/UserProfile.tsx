@@ -24,6 +24,7 @@ interface UserProfileProps {
     _id: string;
     name: string;
     information: string;
+    imageUrl?: string;
     datejoin: string;
   };
   initialPosts: PostPublic[];
@@ -92,6 +93,7 @@ export function UserProfile({
         userId={user._id}
         name={user.name}
         information={user.information}
+        imageUrl={user.imageUrl}
         datejoin={user.datejoin}
         onUpdated={refresh}
       />
@@ -139,13 +141,13 @@ export function UserProfile({
               {likes.length === 0 ? (
                 <p className="ui-muted text-sm">no likes yet.</p>
               ) : (
-                <ul className="divide-y divide-[var(--border)]">
+                <ul className="divide-y divide-border">
                   {likes.map((like) => (
                     <li key={like._id}>
                       <button
                         type="button"
                         onClick={() => openPost(like.post._id)}
-                        className="flex w-full items-start justify-between gap-4 px-1 py-3 text-left transition-colors hover:bg-[var(--surface-hover)]"
+                        className="flex w-full items-start justify-between gap-4 px-1 py-3 text-left transition-colors hover:bg-(--surface-hover)"
                       >
                         <div className="min-w-0">
                           <p className="ui-body text-sm">
@@ -173,13 +175,13 @@ export function UserProfile({
               {comments.length === 0 ? (
                 <p className="ui-muted text-sm">no comments yet.</p>
               ) : (
-                <ul className="divide-y divide-[var(--border)]">
+                <ul className="divide-y divide-border">
                   {comments.map((comment) => (
                     <li key={comment._id}>
                       <button
                         type="button"
                         onClick={() => openPost(comment.post._id)}
-                        className="flex w-full items-start justify-between gap-4 px-1 py-3 text-left transition-colors hover:bg-[var(--surface-hover)]"
+                        className="flex w-full items-start justify-between gap-4 px-1 py-3 text-left transition-colors hover:bg-(--surface-hover)"
                       >
                         <div className="min-w-0">
                           <p className="ui-body text-sm">

@@ -15,7 +15,9 @@ export async function GET(_request: Request, context: RouteContext) {
     const { id } = await context.params;
 
     await connectDB();
-    const user = await User.findById(id).select("name information datejoin");
+    const user = await User.findById(id).select(
+      "name information imageUrl datejoin",
+    );
 
     if (!user) {
       return Response.json({ error: "User not found." }, { status: 404 });
@@ -32,6 +34,7 @@ export async function GET(_request: Request, context: RouteContext) {
         _id: user._id.toString(),
         name: user.name,
         information: user.information,
+        imageUrl: user.imageUrl,
         datejoin: user.datejoin,
       },
       posts: posts.map(serializePost),

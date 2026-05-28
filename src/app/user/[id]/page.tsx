@@ -22,7 +22,9 @@ export default async function UserPage({ params }: PageProps) {
 
   try {
     await connectDB();
-    const user = await User.findById(id).select("name information datejoin").lean();
+    const user = await User.findById(id)
+      .select("name information imageUrl datejoin")
+      .lean();
 
     if (!user) {
       notFound();
@@ -48,6 +50,7 @@ export default async function UserPage({ params }: PageProps) {
           _id: user._id.toString(),
           name: user.name,
           information: user.information ?? "",
+          imageUrl: user.imageUrl ?? "",
           datejoin: user.datejoin,
         }}
         initialPosts={posts}

@@ -3,6 +3,7 @@ export interface UserPublic {
   name: string;
   email: string;
   information?: string;
+  imageUrl?: string;
   datejoin?: string;
 }
 

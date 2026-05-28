@@ -4,6 +4,8 @@ const UserSchema = new Schema({
   name: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true, lowercase: true, trim: true },
   information: { type: String, maxlength: 150, default: "" },
+  imageUrl: { type: String, default: "" },
+  imageKey: { type: String, default: "" },
   datejoin: { type: String, required: true },
   password: { type: String, required: true, minlength: 6 },
   posts: [{ type: Schema.Types.ObjectId, ref: "MusicPost" }],

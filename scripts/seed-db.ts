@@ -5,8 +5,8 @@
  *   npm run db:seed              (remove old seed data, then insert fresh)
  *   npm run db:seed -- --clear   (remove seed data only, no re-insert)
  *
- * Sample posts use classic tracks from Oasis, Billy Joel, and ABBA across
- * YouTube, Spotify, and SoundCloud embed URLs.
+ * Sample posts use classic tracks across YouTube, Spotify, and SoundCloud
+ * embed URLs.
  * All seed users share password: seed123
  *
  * Seed emails use @example.com only. To test password reset, sign up at
@@ -98,6 +98,48 @@ const SEED_POSTS = [
     url: "https://www.youtube.com/watch?v=r8OipmKFDeM",
     caption: "oasis — don't look back in anger. britpop peak",
     tags: ["britpop", "90s", "anthem"],
+    daysAgo: 0,
+  },
+  {
+    creator: "alex_tapes",
+    url: "https://www.youtube.com/watch?v=Zi_XLOBDo_Y",
+    caption: "michael jackson — billie jean. that bassline is undefeated",
+    tags: ["pop", "80s", "bassline"],
+    daysAgo: 11,
+  },
+  {
+    creator: "mira_echo",
+    url: "https://www.youtube.com/watch?v=JGwWNGJdvx8",
+    caption: "ed sheeran — shape of you. stuck in my head again",
+    tags: ["pop", "dance", "earworm"],
+    daysAgo: 8,
+  },
+  {
+    creator: "crate_diver",
+    url: "https://www.youtube.com/watch?v=OPf0YbXqDm0",
+    caption: "mark ronson + bruno mars — uptown funk. instant energy",
+    tags: ["funk", "dance", "party"],
+    daysAgo: 6,
+  },
+  {
+    creator: "luna_tracks",
+    url: "https://www.youtube.com/watch?v=RBumgq5yVrA",
+    caption: "passenger — let her go. rainy window music",
+    tags: ["folk", "acoustic", "rainy-day"],
+    daysAgo: 3,
+  },
+  {
+    creator: "juns_vinyl",
+    url: "https://www.youtube.com/watch?v=YQHsXMglC9A",
+    caption: "adele — hello. huge vocal moment",
+    tags: ["soul", "ballad", "vocals"],
+    daysAgo: 1,
+  },
+  {
+    creator: "mira_echo",
+    url: "https://www.youtube.com/watch?v=fJ9rUzIMcZQ",
+    caption: "queen — bohemian rhapsody. still feels massive",
+    tags: ["rock", "classic", "dramatic"],
     daysAgo: 0,
   },
 ] as const;

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { format } from "date-fns";
 import Lenis from "lenis";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ActivityEvent } from "@/lib/activity";
 
 interface ActivityTimelineProps {
@@ -22,45 +22,63 @@ function formatTime(date: string): string {
 export function ActivityTimeline({ events, className = "" }: ActivityTimelineProps) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const [usePanelScroll, setUsePanelScroll] = useState(false);
 
   useEffect(() => {
     const wrapper = wrapperRef.current;
     const content = contentRef.current;
     if (!wrapper || !content) return;
 
-    const lenis = new Lenis({
-      wrapper,
-      content,
-      lerp: 0.1,
-      smoothWheel: true,
-      autoRaf: true,
-    });
+    const wrapperElement = wrapper;
+    const contentElement = content;
+    const desktopQuery = window.matchMedia("(min-width: 1280px)");
+    let lenis: Lenis | undefined;
+
+    function syncTimelineScroll() {
+      lenis?.destroy();
+      lenis = undefined;
+      setUsePanelScroll(desktopQuery.matches);
+
+      if (!desktopQuery.matches) return;
+
+      lenis = new Lenis({
+        wrapper: wrapperElement,
+        content: contentElement,
+        lerp: 0.1,
+        smoothWheel: true,
+        autoRaf: true,
+      });
+    }
+
+    syncTimelineScroll();
+    desktopQuery.addEventListener("change", syncTimelineScroll);
 
     return () => {
-      lenis.destroy();
+      desktopQuery.removeEventListener("change", syncTimelineScroll);
+      lenis?.destroy();
     };
   }, [events.length]);
 
   return (
     <aside
-      className={`activity-timeline ui-panel sticky top-20 flex max-h-[calc(100vh-8rem)] flex-col ${className}`}
-      data-lenis-prevent
+      className={`activity-timeline ui-panel flex flex-col xl:max-h-[calc(100vh-8rem)] ${className}`}
+      data-lenis-prevent={usePanelScroll ? "" : undefined}
     >
-      <h2 className="ui-title shrink-0 border-b border-[var(--border)] px-5 py-3.5 text-sm font-medium">
+      <h2 className="ui-title shrink-0 border-b border-border px-5 py-3.5 text-sm font-medium">
         activity
       </h2>
 
-      <div ref={wrapperRef} className="min-h-0 flex-1 overflow-hidden">
+      <div ref={wrapperRef} className="min-h-0 flex-1 overflow-visible xl:overflow-hidden">
         <div ref={contentRef}>
           {events.length === 0 ? (
             <p className="ui-muted px-5 py-6 text-sm">no activity yet</p>
           ) : (
-            <ul className="divide-y divide-[var(--border)]">
+            <ul className="divide-y divide-border">
               {events.map((event) => (
                 <li key={event.id} className="activity-row px-5 py-3.5">
                   <div className="flex gap-3">
                     <time
-                      className="ui-meta w-[4.5rem] shrink-0 tabular-nums"
+                      className="ui-meta w-18 shrink-0 tabular-nums"
                       dateTime={event.date}
                     >
                       {formatTime(event.date)}

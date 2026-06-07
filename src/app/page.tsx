@@ -30,7 +30,7 @@ export default async function HomePage() {
 
       <div className="mb-10">
         <h1 className="ui-title text-2xl font-medium">
-          what's song are you listening to?
+          what song are you listening to?
         </h1>
         <p className="ui-muted mt-4 text-sm leading-relaxed">
           songs shared by the community — like, comment, and find your next

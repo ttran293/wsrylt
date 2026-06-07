@@ -519,6 +519,47 @@ header :where(button, span:not(.ui-separator), a:not(.ui-nav-tab)) {
   display: inline;
 }
 
+header .header-mobile-label {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  header .header-mobile-label {
+    display: inline-block;
+  }
+}
+
+.header-auth-link {
+  display: inline-flex;
+  min-width: 2.25rem;
+  align-items: center;
+  justify-content: center;
+  padding-inline: 0.625rem;
+}
+
+.header-auth-icon {
+  display: inline-block;
+}
+
+header .header-auth-label {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .header-auth-link {
+    min-width: 0;
+    padding-inline: 0.75rem;
+  }
+
+  .header-auth-icon {
+    display: none;
+  }
+
+  header .header-auth-label {
+    display: inline;
+  }
+}
+
 .ui-body {
   color: #f0f0f0;
   line-height: 1.55;

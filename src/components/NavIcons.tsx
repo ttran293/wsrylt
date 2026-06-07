@@ -27,7 +27,37 @@ export function NewPostIcon({ className }: IconProps) {
       fill="currentColor"
       aria-hidden
     >
-      <path d="M3 2h10v12H3V2Zm1 1v10h8V3H4Zm3 2h2v3h3v2H9v3H7V8H4V6h3V5Z" />
+      <path d="M7 2h2v5h5v2H9v5H7V9H2V7h5V2Z" />
+    </svg>
+  );
+}
+
+export function LogInIcon({ className }: IconProps) {
+  return (
+    <svg
+      className={className}
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="currentColor"
+      aria-hidden
+    >
+      <path d="M2 2h7v2H4v8h5v2H2V2Zm8.2 3.2L13 8l-2.8 2.8-1.4-1.4.6-.6H6v-2h3.4l-.6-.6 1.4-1.4Z" />
+    </svg>
+  );
+}
+
+export function SignUpIcon({ className }: IconProps) {
+  return (
+    <svg
+      className={className}
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="currentColor"
+      aria-hidden
+    >
+      <path d="M6.5 8A3 3 0 1 0 6.5 2a3 3 0 0 0 0 6Zm0-1.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3ZM1 14c.4-2.8 2.4-4.5 5.5-4.5.9 0 1.7.2 2.4.5l-.7 1.4c-.5-.2-1.1-.4-1.7-.4-1.8 0-3 .7-3.6 2h5.6v1.5H1V14Zm11-6V5.5h1.5V8H16v1.5h-2.5V12H12V9.5H9.5V8H12Z" />
     </svg>
   );
 }

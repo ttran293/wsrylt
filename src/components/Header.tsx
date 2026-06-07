@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { NotificationsMenu } from "@/components/NotificationsMenu";
-import { HomeIcon, NewPostIcon } from "@/components/NavIcons";
+import { HomeIcon, LogInIcon, NewPostIcon, SignUpIcon } from "@/components/NavIcons";
 
 export function Header() {
   const pathname = usePathname();
@@ -23,9 +23,9 @@ export function Header() {
             <HomeIcon className="ui-tab-icon" />
             <span>home</span>
           </Link>
-          <Link href="/post" className={navTabClass("/post")}>
+          <Link href="/post" className={navTabClass("/post")} aria-label="new post">
             <NewPostIcon className="ui-tab-icon" />
-            <span>new post</span>
+            <span className="header-mobile-label">new post</span>
           </Link>
         </nav>
 
@@ -46,11 +46,17 @@ export function Header() {
             </>
           ) : (
             <>
-              <Link href="/login" className="ui-btn">
-                [ log in ]
+              <Link href="/login" className="ui-btn header-auth-link" aria-label="log in">
+                <LogInIcon className="ui-tab-icon header-auth-icon" />
+                <span className="header-auth-label">[ log in ]</span>
               </Link>
-              <Link href="/signup" className="ui-btn ui-btn-accent">
-                [ sign up ]
+              <Link
+                href="/signup"
+                className="ui-btn ui-btn-accent header-auth-link"
+                aria-label="sign up"
+              >
+                <SignUpIcon className="ui-tab-icon header-auth-icon" />
+                <span className="header-auth-label">[ sign up ]</span>
               </Link>
             </>
           )}

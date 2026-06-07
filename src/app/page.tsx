@@ -38,10 +38,11 @@ export default async function HomePage() {
         </p>
       </div>
 
-      <div className="xl:grid xl:grid-cols-[minmax(0,1fr)_24rem] xl:items-start xl:gap-10">
-        <PostFeed initialPosts={posts} initialTags={tags} />
-        <ActivityTimeline events={activity} className="mt-8 xl:mt-0 xl:sticky xl:top-24" />
-      </div>
+      <PostFeed
+        initialPosts={posts}
+        initialTags={tags}
+        sideContent={<ActivityTimeline events={activity} className="xl:sticky xl:top-24" />}
+      />
     </div>
   );
 }

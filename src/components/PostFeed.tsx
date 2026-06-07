@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { PostCard } from "@/components/PostCard";
 import { PostModal } from "@/components/PostModal";
 import { TagFilter } from "@/components/TagFilter";
@@ -9,9 +9,10 @@ import type { PostPublic, TagCount } from "@/types";
 interface PostFeedProps {
   initialPosts: PostPublic[];
   initialTags: TagCount[];
+  sideContent?: ReactNode;
 }
 
-export function PostFeed({ initialPosts, initialTags }: PostFeedProps) {
+export function PostFeed({ initialPosts, initialTags, sideContent }: PostFeedProps) {
   const [posts, setPosts] = useState(initialPosts);
   const [tags, setTags] = useState(initialTags);
   const [activeTag, setActiveTag] = useState<string | null>(null);
@@ -69,34 +70,40 @@ export function PostFeed({ initialPosts, initialTags }: PostFeedProps) {
     <div className="min-w-0">
       <TagFilter tags={tags} activeTag={activeTag} onSelect={handleTagSelect} />
 
-      {loading && (
-        <p className="ui-muted mb-4 text-sm">loading posts...</p>
-      )}
+      <div className="xl:grid xl:grid-cols-[minmax(0,1fr)_24rem] xl:items-start xl:gap-10">
+        <div className="min-w-0">
+          {loading && (
+            <p className="ui-muted mb-4 text-sm">loading posts...</p>
+          )}
 
-      {posts.length === 0 ? (
-        <div className="ui-panel border-dashed p-12 text-center">
-          <p className="text-lg">
-            {activeTag ? `no posts tagged #${activeTag}` : "no posts yet"}
-          </p>
-          <p className="ui-muted mt-2 text-sm">
-            {activeTag
-              ? "try another tag or browse all posts."
-              : "be the first to share a song you love."}
-          </p>
+          {posts.length === 0 ? (
+            <div className="ui-panel border-dashed p-12 text-center">
+              <p className="text-lg">
+                {activeTag ? `no posts tagged #${activeTag}` : "no posts yet"}
+              </p>
+              <p className="ui-muted mt-2 text-sm">
+                {activeTag
+                  ? "try another tag or browse all posts."
+                  : "be the first to share a song you love."}
+              </p>
+            </div>
+          ) : (
+            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+              {posts.map((post) => (
+                <PostCard
+                  key={post._id}
+                  post={post}
+                  onUpdated={refresh}
+                  onOpen={setSelectedPost}
+                  onTagClick={handleTagSelect}
+                />
+              ))}
+            </div>
+          )}
         </div>
-      ) : (
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {posts.map((post) => (
-            <PostCard
-              key={post._id}
-              post={post}
-              onUpdated={refresh}
-              onOpen={setSelectedPost}
-              onTagClick={handleTagSelect}
-            />
-          ))}
-        </div>
-      )}
+
+        {sideContent && <div className="mt-8 xl:mt-0">{sideContent}</div>}
+      </div>
 
       {selectedPost && (
         <PostModal

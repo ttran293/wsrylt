@@ -19,6 +19,14 @@ function formatTime(date: string): string {
   }
 }
 
+function formatActivityDate(date: string): string {
+  try {
+    return format(new Date(date), "MMM d");
+  } catch {
+    return date;
+  }
+}
+
 export function ActivityTimeline({ events, className = "" }: ActivityTimelineProps) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -78,10 +86,11 @@ export function ActivityTimeline({ events, className = "" }: ActivityTimelinePro
                 <li key={event.id} className="activity-row px-5 py-3.5">
                   <div className="flex gap-3">
                     <time
-                      className="ui-meta w-18 shrink-0 tabular-nums"
+                      className="ui-meta w-20 shrink-0 tabular-nums"
                       dateTime={event.date}
                     >
-                      {formatTime(event.date)}
+                      <span className="block">{formatActivityDate(event.date)}</span>
+                      <span className="block">{formatTime(event.date)}</span>
                     </time>
                     <div className="min-w-0 flex-1">
                       <Link href={`/user/${event.user._id}`} className="ui-link">

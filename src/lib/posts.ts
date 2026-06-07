@@ -20,7 +20,7 @@ export async function getAllPosts(tag?: string) {
 
   return MusicPost.find(filter)
     .populate(postPopulate)
-    .sort({ _id: -1 })
+    .sort({ date: -1, _id: -1 })
     .lean()
     .exec();
 }

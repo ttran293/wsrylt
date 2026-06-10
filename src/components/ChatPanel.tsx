@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import Lenis from "lenis";
 import Pusher from "pusher-js";
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { format } from "date-fns";
 import { useAuth } from "@/components/AuthProvider";
+import type { ActivityEvent } from "@/lib/activity";
 import type { ChatMessagePublic } from "@/lib/chat";
 import { CHAT_CHANNEL, CHAT_MESSAGE_EVENT } from "@/lib/chat-events";
 
@@ -30,14 +32,42 @@ function appendMessage(messages: ChatMessagePublic[], message: ChatMessagePublic
   return [...messages, message].slice(-MAX_MESSAGES);
 }
 
-export function ChatPanel() {
+interface ChatPanelProps {
+  activityEvents?: ActivityEvent[];
+}
+
+export function ChatPanel({ activityEvents = [] }: ChatPanelProps) {
   const { user, loading } = useAuth();
   const [messages, setMessages] = useState<ChatMessagePublic[]>([]);
   const [body, setBody] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(pusherConfigError);
   const [connected, setConnected] = useState(false);
+  const scrollWrapperRef = useRef<HTMLDivElement>(null);
+  const scrollContentRef = useRef<HTMLDivElement>(null);
+  const communityScrollerRef = useRef<Lenis | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const communityItems = useMemo(
+    () =>
+      [
+        ...activityEvents.slice(0, 20).map((event) => ({
+          id: `activity-${event.id}`,
+          date: event.date,
+          type: "activity" as const,
+          event,
+        })),
+        ...messages.map((message) => ({
+          id: `message-${message._id}`,
+          date: message.createdAt,
+          type: "message" as const,
+          message,
+        })),
+      ].sort(
+        (left, right) =>
+          new Date(left.date).getTime() - new Date(right.date).getTime(),
+      ),
+    [activityEvents, messages],
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -88,8 +118,32 @@ export function ChatPanel() {
   }, []);
 
   useEffect(() => {
+    const wrapper = scrollWrapperRef.current;
+    const content = scrollContentRef.current;
+    if (!wrapper || !content) return;
+
+    const lenis = new Lenis({
+      wrapper,
+      content,
+      lerp: 0.1,
+      smoothWheel: true,
+      autoRaf: true,
+    });
+
+    communityScrollerRef.current = lenis;
+
+    return () => {
+      lenis.destroy();
+      if (communityScrollerRef.current === lenis) {
+        communityScrollerRef.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    communityScrollerRef.current?.resize();
     messagesEndRef.current?.scrollIntoView({ block: "end" });
-  }, [messages.length]);
+  }, [communityItems.length]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -122,33 +176,53 @@ export function ChatPanel() {
   }
 
   return (
-    <section className="chat-panel ui-panel flex max-h-112 flex-col">
+    <section className="chat-panel ui-panel flex max-h-128 flex-col">
       <div className="flex shrink-0 items-center justify-between border-b border-border px-5 py-3.5">
-        <h2 className="ui-title text-sm font-medium">chatter</h2>
+        <h2 className="ui-title text-sm font-medium">community</h2>
         <span className={`ui-meta ${connected ? "text-[#7ec8ff]" : ""}`}>
           {connected ? "live" : "offline"}
         </span>
       </div>
 
-      <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-5 py-4" data-lenis-prevent>
-        {messages.length === 0 ? (
-          <p className="ui-muted text-sm">no messages yet</p>
-        ) : (
-          messages.map((message) => (
-            <article key={message._id} className="chat-message">
-              <div className="flex items-baseline justify-between gap-3">
-                <Link href={`/user/${message.sender._id}`} className="ui-link text-sm">
-                  {message.sender.name}
-                </Link>
-                <time className="ui-meta shrink-0 text-xs" dateTime={message.createdAt}>
-                  {formatChatTime(message.createdAt)}
-                </time>
-              </div>
-              <p className="ui-body mt-1 wrap-break-word text-sm">{message.body}</p>
-            </article>
-          ))
-        )}
-        <div ref={messagesEndRef} />
+      <div ref={scrollWrapperRef} className="min-h-0 flex-1 overflow-hidden" data-lenis-prevent>
+        <div ref={scrollContentRef} className="space-y-3 px-5 py-4">
+          {communityItems.length === 0 ? (
+            <p className="ui-muted text-sm">no community updates yet</p>
+          ) : (
+            communityItems.map((item) => {
+              if (item.type === "activity") {
+                return (
+                  <article key={item.id} className="chat-message">
+                    <div className="flex items-baseline justify-between gap-3">
+                      <Link href={`/user/${item.event.user._id}`} className="ui-link text-sm">
+                        {item.event.user.name}
+                      </Link>
+                      <time className="ui-meta shrink-0 text-xs" dateTime={item.event.date}>
+                        {formatChatTime(item.event.date)}
+                      </time>
+                    </div>
+                    <p className="ui-meta mt-1 wrap-break-word text-sm">{item.event.message}</p>
+                  </article>
+                );
+              }
+
+              return (
+                <article key={item.id} className="chat-message">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <Link href={`/user/${item.message.sender._id}`} className="ui-link text-sm">
+                      {item.message.sender.name}
+                    </Link>
+                    <time className="ui-meta shrink-0 text-xs" dateTime={item.message.createdAt}>
+                      {formatChatTime(item.message.createdAt)}
+                    </time>
+                  </div>
+                  <p className="ui-body mt-1 wrap-break-word text-sm">{item.message.body}</p>
+                </article>
+              );
+            })
+          )}
+          <div ref={messagesEndRef} />
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="shrink-0 border-t border-border p-3">

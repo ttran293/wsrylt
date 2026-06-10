@@ -1,4 +1,3 @@
-import { ActivityTicker } from "@/components/ActivityTicker";
 import { ChatPanel } from "@/components/ChatPanel";
 import { PostedBanner } from "@/components/PostedBanner";
 import { PostFeed } from "@/components/PostFeed";
@@ -42,12 +41,10 @@ export default async function HomePage() {
         </p>
       </div>
 
-      <ActivityTicker events={activity} />
-
       <PostFeed
         initialPosts={posts}
         initialTags={tags}
-        sideContent={<ChatPanel />}
+        sideContent={<ChatPanel activityEvents={activity} />}
       />
     </div>
   );

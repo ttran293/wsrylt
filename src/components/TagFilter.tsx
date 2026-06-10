@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import type { TagCount } from "@/types";
 
-const DEFAULT_VISIBLE_TAGS = 8;
+const DEFAULT_VISIBLE_TAGS = 16;
 
 interface TagFilterProps {
   tags: TagCount[];

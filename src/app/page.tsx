@@ -29,11 +29,14 @@ export default async function HomePage() {
     <div>
       <PostedBanner />
 
-      <div className="mb-10">
-        <h1 className="ui-title text-2xl font-medium">
+      <div className="mb-12">
+        <h1
+          className="home-hero-title ui-title font-semibold"
+          data-text="what song are you listening to?"
+        >
           what song are you listening to?
         </h1>
-        <p className="ui-muted mt-4 text-sm leading-relaxed">
+        <p className="ui-muted mt-8 text-lg leading-relaxed">
           songs shared by the community — like, comment, and find your next
           favorite track.
         </p>

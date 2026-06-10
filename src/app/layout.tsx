@@ -32,7 +32,7 @@ export default function RootLayout({
         <AuthProvider>
           <SmoothScroll>
             <Header />
-            <main className="mx-auto w-full max-w-screen-2xl flex-1 px-5 py-10">
+            <main className="w-full flex-1 px-5 py-10">
               {children}
             </main>
           </SmoothScroll>

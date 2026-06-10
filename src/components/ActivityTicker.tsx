@@ -6,16 +6,16 @@ interface ActivityTickerProps {
   events: ActivityEvent[];
 }
 
-function formatTickerDate(date: string): string {
+function formatTickerTime(date: string): string {
   try {
-    return format(new Date(date), "MMM d, h:mm a");
+    return format(new Date(date), "h:mm a");
   } catch {
     return date;
   }
 }
 
 function activityMeta(event: ActivityEvent) {
-  return `${formatTickerDate(event.date)} · ${event.message}`;
+  return `${event.message} · ${formatTickerTime(event.date)}`;
 }
 
 export function ActivityTicker({ events }: ActivityTickerProps) {

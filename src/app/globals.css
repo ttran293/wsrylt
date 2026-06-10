@@ -239,7 +239,7 @@ body > * {
   color: #eeeeee;
   font-size: clamp(2rem, 6vw, 2.5rem);
   font-weight: 600;
-  line-height: 1;
+  line-height: 1.12;
   text-shadow: 0 0 8px rgba(255, 255, 255, 0.18);
 }
 
@@ -497,6 +497,101 @@ main :where(h1, h2) {
   background-size: 100% 3px;
   -webkit-background-clip: text;
   background-clip: text;
+}
+
+.home-hero-title {
+  position: relative;
+  width: 100%;
+  max-width: none;
+  font-size: clamp(1.875rem, 4.4vw, 5.25rem);
+  line-height: 1.14;
+  letter-spacing: 0.02em;
+  padding-bottom: 0.18em;
+  text-decoration: none;
+  background-image:
+    repeating-linear-gradient(
+      180deg,
+      #ffffff 0px,
+      #ffffff 1px,
+      #d0d5d5 1px,
+      #d0d5d5 2px,
+      #f8fafa 2px,
+      #f8fafa 3px
+    );
+  background-size: 100% 3px;
+  filter: drop-shadow(0.08em 0.08em 0 rgba(52, 144, 220, 0.16));
+  animation: home-title-pixel-shift 5.5s steps(1, end) infinite;
+}
+
+.home-hero-title::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  color: #7ec8ff;
+  -webkit-text-fill-color: #7ec8ff;
+  opacity: 0;
+  pointer-events: none;
+  text-shadow: 0.08em 0 #11344d;
+  clip-path: inset(0 0 56% 0);
+  animation: home-title-pixel-ghost 5.5s steps(1, end) infinite;
+}
+
+@media (min-width: 1024px) {
+  .home-hero-title {
+    white-space: nowrap;
+  }
+}
+
+@keyframes home-title-pixel-shift {
+  0%,
+  88%,
+  100% {
+    transform: translate(0);
+  }
+
+  90% {
+    transform: translate(1px, 0);
+  }
+
+  92% {
+    transform: translate(-1px, 1px);
+  }
+
+  94% {
+    transform: translate(0);
+  }
+}
+
+@keyframes home-title-pixel-ghost {
+  0%,
+  88%,
+  100% {
+    opacity: 0;
+    transform: translate(0);
+  }
+
+  90% {
+    opacity: 0.42;
+    transform: translate(0.08em, -0.04em);
+  }
+
+  92% {
+    opacity: 0.28;
+    transform: translate(-0.06em, 0.04em);
+  }
+
+  94% {
+    opacity: 0;
+    transform: translate(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-hero-title,
+  .home-hero-title::after {
+    animation: none;
+  }
 }
 
 .ui-btn,

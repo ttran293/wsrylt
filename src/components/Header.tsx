@@ -16,7 +16,7 @@ export function Header() {
   }
 
   return (
-    <header className="crt-bg sticky top-0 z-40 border-b border-border">
+    <header className="site-header crt-bg sticky top-0 border-b border-border">
       <div className="flex w-full flex-wrap items-center gap-x-2 gap-y-3 px-4 py-3 text-sm">
         <nav className="flex items-center gap-2">
           <Link href="/" className={navTabClass("/")}>

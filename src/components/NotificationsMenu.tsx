@@ -31,7 +31,6 @@ export function NotificationsMenu() {
   const [busy, setBusy] = useState(false);
 
   async function loadNotifications() {
-    setLoading(true);
     try {
       const response = await fetch("/api/notifications", {
         cache: "no-store",
@@ -108,7 +107,7 @@ export function NotificationsMenu() {
 
       {open && (
         <div className="notification-menu ui-panel" data-lenis-prevent>
-          <div className="flex items-center justify-between gap-3 border-b border-border px-3 py-2">
+          <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
             <p className="ui-title text-sm font-medium no-underline">
               notifications
             </p>
@@ -122,11 +121,16 @@ export function NotificationsMenu() {
             </button>
           </div>
 
-          <div className="max-h-96 overflow-y-auto" data-lenis-prevent>
+          <div className="notification-menu-list overflow-y-auto" data-lenis-prevent>
             {loading ? (
-              <p className="ui-muted p-4 text-sm">loading...</p>
+              <p className="ui-muted p-4 text-sm">checking notifications...</p>
             ) : notifications.length === 0 ? (
-              <p className="ui-muted p-4 text-sm">no notifications yet.</p>
+              <div className="p-4">
+                <p className="ui-body text-sm">all quiet</p>
+                <p className="ui-muted mt-1 text-xs">
+                  likes and comments on your posts will show up here.
+                </p>
+              </div>
             ) : (
               <ul>
                 {notifications.map((notification) => (
@@ -137,14 +141,14 @@ export function NotificationsMenu() {
                     }`}
                   >
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm">
-                        {getNotificationText(notification)}
+                      <p className="notification-message text-sm">
+                        <span>{getNotificationText(notification)}</span>
                       </p>
-                      <p className="ui-muted mt-1 truncate text-xs">
+                      <p className="ui-muted mt-1 line-clamp-2 text-xs">
                         {getPostPreview(notification)}
                       </p>
                       {notification.comment && (
-                        <p className="ui-muted mt-1 truncate text-xs">
+                        <p className="ui-muted mt-1 line-clamp-2 text-xs">
                           &quot;{notification.comment.content}&quot;
                         </p>
                       )}

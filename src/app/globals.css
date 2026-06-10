@@ -629,3 +629,63 @@ header .ui-link {
 .activity-row:last-child {
   border-bottom: none;
 }
+
+.activity-ticker {
+  overflow: hidden;
+}
+
+.activity-ticker-window {
+  overflow: hidden;
+  padding-block: 0.75rem;
+}
+
+.activity-ticker-track {
+  display: flex;
+  width: max-content;
+  animation: activity-ticker-scroll 160s linear infinite;
+}
+
+.activity-ticker:hover .activity-ticker-track {
+  animation-play-state: paused;
+}
+
+.activity-ticker-list {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 1.75rem;
+  margin: 0;
+  padding: 0 1.75rem 0 0;
+  list-style: none;
+}
+
+.activity-ticker-item {
+  white-space: nowrap;
+}
+
+.activity-ticker-item::before {
+  content: ">";
+  margin-right: 0.55rem;
+  color: var(--accent);
+}
+
+@keyframes activity-ticker-scroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .activity-ticker-track {
+    animation: none;
+    transform: none;
+  }
+
+  .activity-ticker-window {
+    overflow-x: auto;
+  }
+}

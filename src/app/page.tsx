@@ -1,4 +1,5 @@
-import { ActivityTimeline } from "@/components/ActivityTimeline";
+import { ActivityTicker } from "@/components/ActivityTicker";
+import { ChatPanel } from "@/components/ChatPanel";
 import { PostedBanner } from "@/components/PostedBanner";
 import { PostFeed } from "@/components/PostFeed";
 import { buildActivityFromPosts } from "@/lib/activity";
@@ -38,10 +39,12 @@ export default async function HomePage() {
         </p>
       </div>
 
+      <ActivityTicker events={activity} />
+
       <PostFeed
         initialPosts={posts}
         initialTags={tags}
-        sideContent={<ActivityTimeline events={activity} className="xl:sticky xl:top-24" />}
+        sideContent={<ChatPanel />}
       />
     </div>
   );

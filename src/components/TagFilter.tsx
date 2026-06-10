@@ -54,10 +54,10 @@ export function TagFilter({
   if (tags.length === 0) return null;
 
   return (
-    <div className="mb-6">
-      <p className="ui-muted mb-3 text-sm">filter by tag</p>
+    <div className="mb-3">
+      <p className="ui-muted mb-2 text-xs">filter by tag</p>
 
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-center gap-1.5">
         <button
           type="button"
           onClick={() => onSelect(null)}

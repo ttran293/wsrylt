@@ -87,7 +87,7 @@ export function PostCard({
         <MediaPlayer url={post.posturl} />
       </div>
 
-      <div className="flex flex-1 flex-col border-t border-[var(--border)] p-5">
+      <div className="flex flex-1 flex-col border-t border-border p-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
             {editingCaption && isOwner ? (
@@ -128,7 +128,7 @@ export function PostCard({
                 </div>
               </div>
             ) : (
-              <p className="ui-body text-[0.9375rem]">
+              <p className="ui-body text-sm">
                 {post.caption || (
                   <span className="ui-muted italic">no caption</span>
                 )}
@@ -150,19 +150,19 @@ export function PostCard({
           <TagList
             tags={post.tags ?? []}
             onTagClick={onTagClick}
-            className="mt-3"
+            className="mt-2"
           />
         )}
 
         <div className="mt-auto">
-          <div className="ui-meta flex flex-wrap items-center justify-between gap-2 pb-3">
+          <div className="ui-meta flex flex-wrap items-center justify-between gap-2 pb-2 text-xs">
             <Link href={`/user/${post.creator._id}`} className="ui-link">
               {post.creator.name}
             </Link>
             <DateDisplay date={post.date} />
           </div>
 
-          <div className="flex items-center gap-3 border-t border-[var(--border)] pt-4 text-sm">
+          <div className="flex items-center gap-2 border-t border-border pt-3 text-xs">
           <button
             type="button"
             disabled={busy}

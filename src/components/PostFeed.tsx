@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { useCallback, useState, type ReactNode } from "react";
 import { PostCard } from "@/components/PostCard";
 import { PostModal } from "@/components/PostModal";
 import { TagFilter } from "@/components/TagFilter";
@@ -53,14 +53,6 @@ export function PostFeed({ initialPosts, initialTags, sideContent }: PostFeedPro
     await Promise.all([refreshPosts(activeTag), refreshTags()]);
   }, [activeTag, refreshPosts, refreshTags]);
 
-  useEffect(() => {
-    setPosts(initialPosts);
-  }, [initialPosts]);
-
-  useEffect(() => {
-    setTags(initialTags);
-  }, [initialTags]);
-
   function handleTagSelect(tag: string | null) {
     setActiveTag(tag);
     void refreshPosts(tag);
@@ -70,7 +62,13 @@ export function PostFeed({ initialPosts, initialTags, sideContent }: PostFeedPro
     <div className="min-w-0">
       <TagFilter tags={tags} activeTag={activeTag} onSelect={handleTagSelect} />
 
-      <div className="xl:grid xl:grid-cols-[minmax(0,1fr)_24rem] xl:items-start xl:gap-10">
+      <div
+        className={
+          sideContent
+            ? "xl:grid xl:grid-cols-[minmax(0,1fr)_26rem] xl:items-start xl:gap-6 2xl:grid-cols-[minmax(0,1fr)_28rem]"
+            : ""
+        }
+      >
         <div className="min-w-0">
           {loading && (
             <p className="ui-muted mb-4 text-sm">loading posts...</p>
@@ -88,7 +86,7 @@ export function PostFeed({ initialPosts, initialTags, sideContent }: PostFeedPro
               </p>
             </div>
           ) : (
-            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
               {posts.map((post) => (
                 <PostCard
                   key={post._id}
@@ -102,7 +100,11 @@ export function PostFeed({ initialPosts, initialTags, sideContent }: PostFeedPro
           )}
         </div>
 
-        {sideContent && <div className="mt-8 xl:mt-0">{sideContent}</div>}
+        {sideContent && (
+          <div className="mt-8 xl:sticky xl:top-16 xl:mt-0 xl:h-[calc(100dvh-5rem)]">
+            {sideContent}
+          </div>
+        )}
       </div>
 
       {selectedPost && (

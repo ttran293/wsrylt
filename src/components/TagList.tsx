@@ -8,7 +8,7 @@ export function TagList({ tags, onTagClick, className = "" }: TagListProps) {
   if (tags.length === 0) return null;
 
   return (
-    <ul className={`flex flex-wrap gap-2 ${className}`}>
+    <ul className={`flex flex-wrap gap-1.5 ${className}`}>
       {tags.map((tag) => (
         <li key={tag}>
           {onTagClick ? (

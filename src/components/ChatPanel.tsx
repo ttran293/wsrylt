@@ -34,9 +34,10 @@ function appendMessage(messages: ChatMessagePublic[], message: ChatMessagePublic
 
 interface ChatPanelProps {
   activityEvents?: ActivityEvent[];
+  className?: string;
 }
 
-export function ChatPanel({ activityEvents = [] }: ChatPanelProps) {
+export function ChatPanel({ activityEvents = [], className = "" }: ChatPanelProps) {
   const { user, loading } = useAuth();
   const [messages, setMessages] = useState<ChatMessagePublic[]>([]);
   const [body, setBody] = useState("");
@@ -142,7 +143,17 @@ export function ChatPanel({ activityEvents = [] }: ChatPanelProps) {
 
   useEffect(() => {
     communityScrollerRef.current?.resize();
-    messagesEndRef.current?.scrollIntoView({ block: "end" });
+    window.requestAnimationFrame(() => {
+      const scroller = communityScrollerRef.current;
+      const endMarker = messagesEndRef.current;
+
+      if (!scroller || !endMarker) {
+        endMarker?.scrollIntoView({ block: "end" });
+        return;
+      }
+
+      scroller.scrollTo(endMarker, { immediate: true });
+    });
   }, [communityItems.length]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -176,7 +187,7 @@ export function ChatPanel({ activityEvents = [] }: ChatPanelProps) {
   }
 
   return (
-    <section className="chat-panel ui-panel flex max-h-128 flex-col">
+    <section className={`chat-panel ui-panel flex max-h-128 flex-col ${className}`}>
       <div className="flex shrink-0 items-center justify-between border-b border-border px-5 py-3.5">
         <h2 className="ui-title text-sm font-medium">community</h2>
         <span className={`ui-meta ${connected ? "text-[#7ec8ff]" : ""}`}>

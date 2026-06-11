@@ -31,7 +31,7 @@ export default async function HomePage() {
 
         <div className="mb-5">
           <h1 className="home-hero-title ui-title font-semibold">
-            <span>what song are you listening to?</span>
+            <span className="home-hero-typewriter">what song are you listening to?</span>
             <span className="home-hero-cursor" aria-hidden="true" />
           </h1>
           <p className="ui-muted mt-2 text-sm leading-relaxed">

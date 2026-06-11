@@ -568,7 +568,15 @@ main :where(h1, h2) {
   translate: 0 0.06em;
   background: #7ec8ff;
   box-shadow: 0 0 10px rgba(52, 144, 220, 0.35);
-  animation: home-cursor-blink 1.05s steps(1, end) infinite;
+  animation: home-cursor-blink 1.8s steps(1, end) infinite;
+}
+
+.home-hero-typewriter {
+  display: inline-block;
+  max-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  animation: home-title-typewriter 30s steps(32, end) 0.2s infinite;
 }
 
 @media (min-width: 1024px) {
@@ -589,7 +597,29 @@ main :where(h1, h2) {
   }
 }
 
+@keyframes home-title-typewriter {
+  0%,
+  4% {
+    max-width: 0;
+  }
+
+  12%,
+  88% {
+    max-width: 32ch;
+  }
+
+  98%,
+  100% {
+    max-width: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .home-hero-typewriter {
+    max-width: none;
+    animation: none;
+  }
+
   .home-hero-cursor {
     animation: none;
   }

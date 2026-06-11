@@ -56,7 +56,7 @@ export function Header() {
                 aria-label="sign up"
               >
                 <SignUpIcon className="ui-tab-icon header-auth-icon" />
-                <span className="header-auth-label">[ sign up ]</span>
+                <span className="header-auth-label signup-label-bop">[ sign up ]</span>
               </Link>
             </>
           )}

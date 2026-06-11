@@ -200,7 +200,9 @@ export function ChatPanel({ activityEvents = [], className = "" }: ChatPanelProp
           {communityItems.length === 0 ? (
             <p className="ui-muted text-sm">no community updates yet</p>
           ) : (
-            communityItems.map((item) => {
+            communityItems.map((item, index) => {
+              const isLatestItem = index === communityItems.length - 1;
+
               if (item.type === "activity") {
                 return (
                   <article key={item.id} className="chat-message">
@@ -212,7 +214,13 @@ export function ChatPanel({ activityEvents = [], className = "" }: ChatPanelProp
                         {formatChatTime(item.event.date)}
                       </time>
                     </div>
-                    <p className="ui-meta mt-1 wrap-break-word text-sm">{item.event.message}</p>
+                    <p
+                      className={`ui-meta mt-1 wrap-break-word text-sm ${
+                        isLatestItem ? "chat-latest-text-bop" : ""
+                      }`}
+                    >
+                      {item.event.message}
+                    </p>
                   </article>
                 );
               }
@@ -227,7 +235,13 @@ export function ChatPanel({ activityEvents = [], className = "" }: ChatPanelProp
                       {formatChatTime(item.message.createdAt)}
                     </time>
                   </div>
-                  <p className="ui-body mt-1 wrap-break-word text-sm">{item.message.body}</p>
+                  <p
+                    className={`ui-body mt-1 wrap-break-word text-sm ${
+                      isLatestItem ? "chat-latest-text-bop" : ""
+                    }`}
+                  >
+                    {item.message.body}
+                  </p>
                 </article>
               );
             })

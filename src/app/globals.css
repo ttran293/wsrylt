@@ -423,6 +423,14 @@ body > * {
   animation: 1.95s steps(2, end) infinite tab-icon-bop;
 }
 
+.ui-tag-bop .ui-tag-label,
+.ui-tag-bop .ui-tag-count,
+.chat-latest-text-bop,
+.signup-label-bop {
+  display: inline-block;
+  animation: 1.95s steps(2, end) infinite tab-icon-bop;
+}
+
 .ui-nav-tab {
   display: inline-flex;
   align-items: center;

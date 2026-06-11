@@ -65,12 +65,14 @@ export function TagFilter({
         >
           all
         </button>
-        {visibleTags.map(({ tag, count }) => (
+        {visibleTags.map(({ tag, count }, index) => (
           <button
             key={tag}
             type="button"
             onClick={() => onSelect(tag)}
-            className={`ui-tag ${activeTag === tag ? "ui-tag-active" : "ui-tag-link"}`}
+            className={`ui-tag ${activeTag === tag ? "ui-tag-active" : "ui-tag-link"} ${
+              index === 0 ? "ui-tag-bop" : ""
+            }`}
           >
             <span className="ui-tag-label">#{tag}</span>
             <span className="ui-tag-count">{count}</span>

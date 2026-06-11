@@ -1,10 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import {
-  Fira_Code,
-  Inter,
-  JetBrains_Mono,
-  Space_Grotesk,
-} from "next/font/google";
+import { Fira_Code, Inter } from "next/font/google";
 import { AuthProvider } from "@/components/AuthProvider";
 import { Header } from "@/components/Header";
 import { SmoothScroll } from "@/components/SmoothScroll";
@@ -20,18 +15,6 @@ const titleSans = Inter({
   variable: "--font-title-sans",
   subsets: ["latin"],
   weight: ["700", "800"],
-});
-
-const titleDisplay = Space_Grotesk({
-  variable: "--font-title-display",
-  subsets: ["latin"],
-  weight: ["600", "700"],
-});
-
-const titleMono = JetBrains_Mono({
-  variable: "--font-title-mono",
-  subsets: ["latin"],
-  weight: ["700"],
 });
 
 export const metadata: Metadata = {
@@ -52,7 +35,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${firaCode.variable} ${titleSans.variable} ${titleDisplay.variable} ${titleMono.variable} h-full`}
+      className={`${firaCode.variable} ${titleSans.variable} h-full`}
     >
       <body className={`${firaCode.className} flex min-h-full flex-col`}>
         <AuthProvider>

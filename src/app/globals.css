@@ -552,18 +552,18 @@ main :where(h1, h2) {
   line-height: 1.12;
   letter-spacing: 0;
   padding-block: 0.08em 0.12em;
-  color: #eeeeee;
-  -webkit-text-fill-color: #eeeeee;
+  color: #fff4cf;
+  -webkit-text-fill-color: #fff4cf;
   text-decoration: none;
-  text-shadow:
-    0 0 8px rgba(255, 255, 255, 0.12),
-    0 0 18px rgba(126, 200, 255, 0.1);
-  background: none;
+  opacity: 0.94;
   filter: none;
+  text-shadow:
+    0 0 4px rgba(255, 248, 215, 0.42),
+    0 0 14px rgba(255, 188, 72, 0.36),
+    0 0 34px rgba(255, 142, 31, 0.18);
+  background: none;
   overflow: visible;
-  animation:
-    home-title-font-cycle 105s steps(1, end) infinite,
-    home-title-effect-cycle 105s ease-in-out infinite;
+  animation: home-title-bulb-flicker 8.5s steps(1, end) infinite;
 }
 
 .home-hero-title::before,
@@ -572,8 +572,8 @@ main :where(h1, h2) {
   inset: 0;
   z-index: -1;
   content: attr(data-text);
-  color: #eeeeee;
-  -webkit-text-fill-color: #eeeeee;
+  color: #fff0bd;
+  -webkit-text-fill-color: #fff0bd;
   font-family: inherit;
   font-weight: inherit;
   pointer-events: none;
@@ -582,16 +582,22 @@ main :where(h1, h2) {
 }
 
 .home-hero-title::before {
+  opacity: 0.18;
+  transform: translateY(0.03em) scale(1.008);
+  filter: blur(0.035em);
   text-shadow:
-    0.045em 0 rgba(126, 200, 255, 0.45),
-    -0.045em 0 rgba(255, 97, 136, 0.28);
-  animation: home-title-split-cycle 105s steps(1, end) infinite;
+    0 0 18px rgba(255, 195, 83, 0.42),
+    0 0 42px rgba(255, 149, 36, 0.22);
 }
 
 .home-hero-title::after {
-  filter: blur(0.055em);
-  transform: translateY(0.02em);
-  animation: home-title-haze-cycle 105s ease-in-out infinite;
+  opacity: 0.32;
+  filter: blur(0.16em);
+  transform: translateY(0.045em) scale(1.018);
+  text-shadow:
+    0 0 22px rgba(255, 206, 104, 0.5),
+    0 0 52px rgba(255, 154, 37, 0.36),
+    0 0 86px rgba(255, 111, 0, 0.18);
 }
 
 @media (min-width: 1024px) {
@@ -600,133 +606,35 @@ main :where(h1, h2) {
   }
 }
 
-@keyframes home-title-font-cycle {
+@keyframes home-title-bulb-flicker {
   0%,
-  33.32% {
-    font-family: var(--font-title-sans), Arial, Helvetica, sans-serif;
-    font-weight: 800;
-    letter-spacing: -0.06em;
-  }
-
-  33.33%,
-  66.65% {
-    font-family: var(--font-title-display), Arial, Helvetica, sans-serif;
-    font-weight: 700;
-    letter-spacing: -0.055em;
-  }
-
-  66.66%,
+  8%,
+  10%,
+  14%,
+  16%,
   100% {
-    font-family: var(--font-title-mono), "Courier New", Courier, monospace;
-    font-weight: 700;
-    letter-spacing: -0.075em;
+    opacity: 0.94;
+    text-shadow:
+      0 0 4px rgba(255, 248, 215, 0.42),
+      0 0 14px rgba(255, 188, 72, 0.36),
+      0 0 34px rgba(255, 142, 31, 0.18);
   }
-}
 
-@keyframes home-title-effect-cycle {
-  0%,
-  28.4%,
-  33.4%,
-  61.8%,
-  66.8%,
-  95.2%,
-  100% {
-    filter: none;
+  9%,
+  15% {
+    opacity: 0.72;
+    text-shadow:
+      0 0 2px rgba(255, 248, 215, 0.2),
+      0 0 8px rgba(255, 188, 72, 0.18),
+      0 0 18px rgba(255, 142, 31, 0.08);
+  }
+
+  11% {
     opacity: 1;
-    transform: translateY(0);
     text-shadow:
-      0 0 8px rgba(255, 255, 255, 0.12),
-      0 0 18px rgba(126, 200, 255, 0.1);
-  }
-
-  30%,
-  32% {
-    text-shadow:
-      0 0 12px rgba(255, 255, 255, 0.28),
-      0 0 28px rgba(126, 200, 255, 0.28),
-      0 0 42px rgba(126, 200, 255, 0.14);
-  }
-
-  63.2%,
-  65.2% {
-    filter: blur(0.035em);
-    opacity: 0.78;
-  }
-
-  96.2% {
-    transform: translate(0.018em, -0.012em);
-  }
-
-  97% {
-    transform: translate(-0.014em, 0.01em);
-  }
-
-  97.8% {
-    transform: translate(0.01em, 0.014em);
-  }
-
-  98.6% {
-    text-shadow:
-      0 0 10px rgba(255, 255, 255, 0.18),
-      0 0 22px rgba(255, 255, 255, 0.12);
-  }
-}
-
-@keyframes home-title-split-cycle {
-  0%,
-  28.4%,
-  33.4%,
-  61.8%,
-  66.8%,
-  95.2%,
-  100% {
-    opacity: 0;
-    transform: translate(0);
-  }
-
-  96.2% {
-    opacity: 0.34;
-    transform: translate(0.025em, -0.015em);
-  }
-
-  97% {
-    opacity: 0.28;
-    transform: translate(-0.02em, 0.01em);
-  }
-
-  97.8% {
-    opacity: 0.3;
-    transform: translate(0.012em, 0.018em);
-  }
-}
-
-@keyframes home-title-haze-cycle {
-  0%,
-  28.4%,
-  33.4%,
-  61.8%,
-  66.8%,
-  95.2%,
-  100% {
-    opacity: 0;
-    transform: translateY(0.02em);
-  }
-
-  30%,
-  32% {
-    opacity: 0.18;
-  }
-
-  63.2%,
-  65.2% {
-    opacity: 0.28;
-    transform: translateY(0.025em);
-  }
-
-  97%,
-  98.6% {
-    opacity: 0.2;
-    transform: translateY(0.015em);
+      0 0 6px rgba(255, 248, 215, 0.58),
+      0 0 20px rgba(255, 188, 72, 0.5),
+      0 0 44px rgba(255, 142, 31, 0.26);
   }
 }
 

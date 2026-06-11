@@ -84,12 +84,60 @@ body > * {
 }
 
 .chat-message {
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid color-mix(in srgb, var(--border) 58%, transparent);
+  padding-bottom: 0;
 }
 
-.chat-message:last-child {
-  border-bottom: none;
+.chat-date-divider {
+  margin: 0.7rem 0 0.45rem;
+  color: #9a9a9a;
+  font-size: 1.05rem;
+  letter-spacing: 0.08em;
+  text-align: center;
+}
+
+.chat-line {
+  display: grid;
+  grid-template-columns: auto auto auto minmax(0, 1fr);
+  align-items: baseline;
+  column-gap: 0.2rem;
+  padding-bottom: 0.2rem;
+}
+
+.chat-time {
+  color: #777777;
+  font-size: 0.72rem;
+  font-style: italic;
+  white-space: nowrap;
+}
+
+.chat-panel .chat-username {
+  color: #7ec8ff;
+  -webkit-text-fill-color: #7ec8ff;
+  font-size: 0.875rem;
+  font-style: italic;
+  font-weight: 700;
+  text-decoration: underline;
+  text-shadow: none;
+  white-space: nowrap;
+}
+
+.chat-colon {
+  color: #eeeeee;
+  -webkit-text-fill-color: #eeeeee;
+  font-size: 0.875rem;
+  text-shadow: none;
+}
+
+.chat-text,
+.chat-context {
+  min-width: 0;
+  color: #eeeeee;
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+.chat-context {
+  color: #b8b8b8;
 }
 
 .ui-btn {

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Lenis from "lenis";
 import Pusher from "pusher-js";
-import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { format } from "date-fns";
 import { useAuth } from "@/components/AuthProvider";
 import type { ActivityEvent } from "@/lib/activity";
@@ -18,7 +18,15 @@ const pusherConfigError =
 
 function formatChatTime(date: string): string {
   try {
-    return format(new Date(date), "MMM d, h:mm a");
+    return format(new Date(date), "h:mm a");
+  } catch {
+    return date;
+  }
+}
+
+function formatChatDate(date: string): string {
+  try {
+    return format(new Date(date), "M/d/yyyy");
   } catch {
     return date;
   }
@@ -196,53 +204,69 @@ export function ChatPanel({ activityEvents = [], className = "" }: ChatPanelProp
       </div>
 
       <div ref={scrollWrapperRef} className="min-h-0 flex-1 overflow-hidden" data-lenis-prevent>
-        <div ref={scrollContentRef} className="space-y-3 px-5 py-4">
+        <div ref={scrollContentRef} className="px-5 py-4">
           {communityItems.length === 0 ? (
             <p className="ui-muted text-sm">no community updates yet</p>
           ) : (
             communityItems.map((item, index) => {
               const isLatestItem = index === communityItems.length - 1;
+              const itemDate = formatChatDate(item.date);
+              const previousDate =
+                index > 0 ? formatChatDate(communityItems[index - 1].date) : null;
+              const showDate = itemDate !== previousDate;
 
               if (item.type === "activity") {
                 return (
-                  <article key={item.id} className="chat-message">
-                    <div className="flex items-baseline justify-between gap-3">
-                      <Link href={`/user/${item.event.user._id}`} className="ui-link text-sm">
-                        {item.event.user.name}
-                      </Link>
-                      <time className="ui-meta shrink-0 text-xs" dateTime={item.event.date}>
+                  <Fragment key={item.id}>
+                    {showDate && (
+                      <div className="chat-date-divider" aria-label={itemDate}>
+                        {itemDate}
+                      </div>
+                    )}
+                    <article className="chat-message chat-line">
+                      <time className="chat-time" dateTime={item.event.date}>
                         {formatChatTime(item.event.date)}
                       </time>
-                    </div>
-                    <p
-                      className={`ui-meta mt-1 wrap-break-word text-sm ${
-                        isLatestItem ? "chat-latest-text-bop" : ""
-                      }`}
-                    >
-                      {item.event.message}
-                    </p>
-                  </article>
+                      <Link href={`/user/${item.event.user._id}`} className="chat-username">
+                        {item.event.user.name}
+                      </Link>
+                      <span className="chat-colon">:</span>
+                      <span
+                        className={`chat-context wrap-break-word ${
+                          isLatestItem ? "chat-latest-text-bop" : ""
+                        }`}
+                      >
+                        {item.event.message}
+                      </span>
+                    </article>
+                  </Fragment>
                 );
               }
 
               return (
-                <article key={item.id} className="chat-message">
-                  <div className="flex items-baseline justify-between gap-3">
-                    <Link href={`/user/${item.message.sender._id}`} className="ui-link text-sm">
-                      {item.message.sender.name}
-                    </Link>
-                    <time className="ui-meta shrink-0 text-xs" dateTime={item.message.createdAt}>
+                <Fragment key={item.id}>
+                  {showDate && (
+                    <div className="chat-date-divider" aria-label={itemDate}>
+                      {itemDate}
+                    </div>
+                  )}
+                  <article className="chat-message chat-line">
+                    <time className="chat-time" dateTime={item.message.createdAt}>
                       {formatChatTime(item.message.createdAt)}
                     </time>
-                  </div>
-                  <p
-                    className={`ui-body mt-1 wrap-break-word text-sm ${
-                      isLatestItem ? "chat-latest-text-bop" : ""
-                    }`}
-                  >
-                    {item.message.body}
-                  </p>
-                </article>
+                    <Link href={`/user/${item.message.sender._id}`} className="chat-username">
+                      {item.message.sender.name}
+                    </Link>
+                    <span className="chat-colon">:</span>
+                    <span
+                      className={`chat-text wrap-break-word ${
+                        isLatestItem ? "chat-latest-text-bop" : ""
+                      }`}
+                    >
+                      {item.message.body}
+                    </span>
+                  </article>
+                </Fragment>
               );
             })
           )}

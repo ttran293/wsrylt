@@ -154,7 +154,7 @@ export function PostCard({
           />
         )}
 
-        <div className="mt-auto">
+        <div className="mt-auto pt-4">
           <div className="ui-meta flex flex-wrap items-center justify-between gap-2 pb-2 text-xs">
             <Link href={`/user/${post.creator._id}`} className="ui-link">
               {post.creator.name}

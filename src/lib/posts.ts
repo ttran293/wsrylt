@@ -2,14 +2,14 @@ import "@/lib/models";
 import { MusicPost } from "@/lib/models/MusicPost";
 
 const postPopulate = [
-  { path: "creator", select: "name information datejoin email" },
+  { path: "creator", select: "name information datejoin email imageUrl" },
   {
     path: "comments",
-    populate: { path: "byUser", select: "name" },
+    populate: { path: "byUser", select: "name imageUrl" },
   },
   {
     path: "likes",
-    populate: { path: "byUser", select: "name" },
+    populate: { path: "byUser", select: "name imageUrl" },
   },
 ];
 

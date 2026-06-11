@@ -6,7 +6,7 @@ export interface ActivityEvent {
   id: string;
   kind: ActivityKind;
   date: string;
-  user: { _id: string; name: string };
+  user: { _id: string; name: string; imageUrl?: string };
   message: string;
 }
 
@@ -35,7 +35,11 @@ export function buildActivityFromPosts(
       id: `post-${post._id}`,
       kind: "post",
       date: post.date,
-      user: { _id: post.creator._id, name: post.creator.name },
+      user: {
+        _id: post.creator._id,
+        name: post.creator.name,
+        imageUrl: post.creator.imageUrl,
+      },
       message: post.caption
         ? `shared: ${truncate(post.caption)}`
         : "shared a song",
@@ -46,7 +50,11 @@ export function buildActivityFromPosts(
         id: `comment-${comment._id}`,
         kind: "comment",
         date: comment.date,
-        user: { _id: comment.byUser._id, name: comment.byUser.name },
+        user: {
+          _id: comment.byUser._id,
+          name: comment.byUser.name,
+          imageUrl: comment.byUser.imageUrl,
+        },
         message: `commented: "${truncate(comment.content)}"`,
       });
     }
@@ -56,7 +64,11 @@ export function buildActivityFromPosts(
         id: `like-${like._id}`,
         kind: "like",
         date: objectIdToISO(like._id),
-        user: { _id: like.byUser._id, name: like.byUser.name },
+        user: {
+          _id: like.byUser._id,
+          name: like.byUser.name,
+          imageUrl: like.byUser.imageUrl,
+        },
         message: `liked ${post.creator.name}'s post`,
       });
     }

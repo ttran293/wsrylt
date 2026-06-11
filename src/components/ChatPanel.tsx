@@ -40,6 +40,31 @@ function appendMessage(messages: ChatMessagePublic[], message: ChatMessagePublic
   return [...messages, message].slice(-MAX_MESSAGES);
 }
 
+function ChatAuthor({
+  user,
+}: {
+  user: { _id: string; name: string; imageUrl?: string };
+}) {
+  const initial = user.name.trim().charAt(0).toLowerCase() || "?";
+
+  return (
+    <Link href={`/user/${user._id}`} className="chat-username chat-author">
+      {user.imageUrl ? (
+        <img
+          src={user.imageUrl}
+          alt={`${user.name}'s profile picture`}
+          className="chat-avatar"
+        />
+      ) : (
+        <span className="chat-avatar chat-avatar-fallback" aria-hidden="true">
+          {initial}
+        </span>
+      )}
+      <span className="chat-username-text">{user.name}</span>
+    </Link>
+  );
+}
+
 interface ChatPanelProps {
   activityEvents?: ActivityEvent[];
   className?: string;
@@ -227,9 +252,7 @@ export function ChatPanel({ activityEvents = [], className = "" }: ChatPanelProp
                       <time className="chat-time" dateTime={item.event.date}>
                         {formatChatTime(item.event.date)}
                       </time>
-                      <Link href={`/user/${item.event.user._id}`} className="chat-username">
-                        {item.event.user.name}
-                      </Link>
+                      <ChatAuthor user={item.event.user} />
                       <span className="chat-colon">:</span>
                       <span
                         className={`chat-context wrap-break-word ${
@@ -254,9 +277,7 @@ export function ChatPanel({ activityEvents = [], className = "" }: ChatPanelProp
                     <time className="chat-time" dateTime={item.message.createdAt}>
                       {formatChatTime(item.message.createdAt)}
                     </time>
-                    <Link href={`/user/${item.message.sender._id}`} className="chat-username">
-                      {item.message.sender.name}
-                    </Link>
+                    <ChatAuthor user={item.message.sender} />
                     <span className="chat-colon">:</span>
                     <span
                       className={`chat-text wrap-break-word ${

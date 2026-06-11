@@ -11,12 +11,12 @@ export interface CommentPublic {
   _id: string;
   content: string;
   date: string;
-  byUser: { _id: string; name: string };
+  byUser: { _id: string; name: string; imageUrl?: string };
 }
 
 export interface LikePublic {
   _id: string;
-  byUser: { _id: string; name: string };
+  byUser: { _id: string; name: string; imageUrl?: string };
 }
 
 export interface PostPublic {

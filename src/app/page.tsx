@@ -45,7 +45,7 @@ export default async function HomePage() {
         <PostFeed initialPosts={posts} initialTags={tags} />
       </div>
 
-      <aside className="mt-8 xl:sticky xl:top-16 xl:mt-0 xl:h-[calc(100dvh-5rem)]">
+      <aside className="mt-8 xl:fixed xl:top-20 xl:right-4 xl:bottom-4 xl:mt-0 xl:w-104 2xl:w-md">
         <ChatPanel
           activityEvents={activity}
           className="xl:h-full xl:max-h-none"

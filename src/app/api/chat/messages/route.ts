@@ -10,11 +10,15 @@ import { CHAT_CHANNEL, CHAT_MESSAGE_EVENT } from "@/lib/chat-events";
 import { connectDB } from "@/lib/mongodb";
 import { ChatMessage } from "@/lib/models/ChatMessage";
 import { getPusherServer } from "@/lib/pusher";
+import {
+  censorChatMessageBody,
+  chatMessageBodySchema,
+} from "@/lib/validation/chat-message";
 
 export const dynamic = "force-dynamic";
 
 const chatMessageSchema = z.object({
-  body: z.string().trim().min(1).max(500),
+  body: chatMessageBodySchema,
 });
 
 const chatMessagesQuerySchema = z.object({
@@ -53,10 +57,14 @@ export async function POST(request: NextRequest) {
       return Response.json({ error: "Message must be 1-500 characters." }, { status: 400 });
     }
 
+    const rawBody = parsed.data.body;
+    const censoredBody = censorChatMessageBody(rawBody);
+
     await connectDB();
     const created = await ChatMessage.create({
       sender: auth.userId,
-      body: parsed.data.body,
+      body: censoredBody,
+      bodyRaw: rawBody,
     });
     await created.populate({ path: "sender", select: "name imageUrl" });
 

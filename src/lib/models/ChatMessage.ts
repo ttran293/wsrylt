@@ -1,9 +1,16 @@
 import mongoose, { Schema, type InferSchemaType, type Model } from "mongoose";
+import { MAX_CHAT_MESSAGE_LENGTH } from "@/lib/validation/chat-message";
 
 const ChatMessageSchema = new Schema(
   {
     sender: { type: Schema.Types.ObjectId, required: true, ref: "User" },
-    body: { type: String, required: true, trim: true, maxlength: 500 },
+    body: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: MAX_CHAT_MESSAGE_LENGTH,
+    },
+    bodyRaw: { type: String, trim: true, maxlength: MAX_CHAT_MESSAGE_LENGTH },
   },
   { timestamps: { createdAt: true, updatedAt: false } },
 );

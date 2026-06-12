@@ -12,6 +12,7 @@ import type { PostPublic } from "@/types";
 interface PostCardProps {
   post: PostPublic;
   showDelete?: boolean;
+  onPostChanged?: (post: PostPublic) => void;
   onUpdated?: () => void;
   onOpen?: (post: PostPublic) => void;
   onTagClick?: (tag: string) => void;
@@ -20,6 +21,7 @@ interface PostCardProps {
 export function PostCard({
   post,
   showDelete = false,
+  onPostChanged,
   onUpdated,
   onOpen,
   onTagClick,
@@ -41,15 +43,63 @@ export function PostCard({
     }
 
     setBusy(true);
+    const previousPost = post;
     try {
       if (userLike) {
-        await fetch(`/api/posts/${post._id}/likes/${userLike._id}`, {
+        const optimisticPost = {
+          ...post,
+          likes: post.likes.filter((like) => like._id !== userLike._id),
+        };
+        onPostChanged?.(optimisticPost);
+
+        const response = await fetch(`/api/posts/${post._id}/likes/${userLike._id}`, {
           method: "DELETE",
         });
+
+        if (!response.ok) {
+          throw new Error("Could not remove like.");
+        }
       } else {
-        await fetch(`/api/posts/${post._id}/likes`, { method: "POST" });
+        const temporaryLike = {
+          _id: `pending-${user.userId}`,
+          byUser: {
+            _id: user.userId,
+            name: user.name,
+          },
+        };
+        const optimisticPost = {
+          ...post,
+          likes: [...post.likes, temporaryLike],
+        };
+        onPostChanged?.(optimisticPost);
+
+        const response = await fetch(`/api/posts/${post._id}/likes`, { method: "POST" });
+        const data = (await response.json().catch(() => null)) as {
+          resultLikeID?: string;
+        } | null;
+
+        if (!response.ok) {
+          throw new Error("Could not add like.");
+        }
+
+        const resultLikeID = data?.resultLikeID;
+        if (resultLikeID) {
+          onPostChanged?.({
+            ...optimisticPost,
+            likes: optimisticPost.likes.map((like) =>
+              like._id === temporaryLike._id
+                ? { ...like, _id: resultLikeID }
+                : like,
+            ),
+          });
+        }
       }
-      onUpdated?.();
+
+      if (!onPostChanged) {
+        onUpdated?.();
+      }
+    } catch {
+      onPostChanged?.(previousPost);
     } finally {
       setBusy(false);
     }

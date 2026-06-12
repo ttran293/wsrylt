@@ -85,6 +85,17 @@ export function PostFeed({ initialPosts, initialTags, sideContent }: PostFeedPro
     await Promise.all([refreshPosts(activeTag), refreshTags()]);
   }, [activeTag, refreshPosts, refreshTags]);
 
+  const updatePost = useCallback((updatedPost: PostPublic) => {
+    setPosts((current) =>
+      current.map((post) =>
+        post._id === updatedPost._id ? updatedPost : post,
+      ),
+    );
+    setSelectedPost((current) =>
+      current?._id === updatedPost._id ? updatedPost : current,
+    );
+  }, []);
+
   useEffect(() => {
     activeTagRef.current = activeTag;
   }, [activeTag]);
@@ -152,6 +163,7 @@ export function PostFeed({ initialPosts, initialTags, sideContent }: PostFeedPro
                 <PostCard
                   key={post._id}
                   post={post}
+                  onPostChanged={updatePost}
                   onUpdated={refresh}
                   onOpen={setSelectedPost}
                   onTagClick={handleTagSelect}
@@ -172,6 +184,7 @@ export function PostFeed({ initialPosts, initialTags, sideContent }: PostFeedPro
         <PostModal
           post={selectedPost}
           onClose={() => setSelectedPost(null)}
+          onPostChanged={updatePost}
           onUpdated={refresh}
           onTagClick={handleTagSelect}
         />

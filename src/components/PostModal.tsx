@@ -11,11 +11,18 @@ import type { PostPublic } from "@/types";
 interface PostModalProps {
   post: PostPublic;
   onClose: () => void;
+  onPostChanged?: (post: PostPublic) => void;
   onUpdated: () => void;
   onTagClick?: (tag: string) => void;
 }
 
-export function PostModal({ post, onClose, onUpdated, onTagClick }: PostModalProps) {
+export function PostModal({
+  post,
+  onClose,
+  onPostChanged,
+  onUpdated,
+  onTagClick,
+}: PostModalProps) {
   const { user } = useAuth();
   const router = useRouter();
   const [comment, setComment] = useState("");
@@ -30,15 +37,63 @@ export function PostModal({ post, onClose, onUpdated, onTagClick }: PostModalPro
     }
 
     setBusy(true);
+    const previousPost = post;
     try {
       if (userLike) {
-        await fetch(`/api/posts/${post._id}/likes/${userLike._id}`, {
+        const optimisticPost = {
+          ...post,
+          likes: post.likes.filter((like) => like._id !== userLike._id),
+        };
+        onPostChanged?.(optimisticPost);
+
+        const response = await fetch(`/api/posts/${post._id}/likes/${userLike._id}`, {
           method: "DELETE",
         });
+
+        if (!response.ok) {
+          throw new Error("Could not remove like.");
+        }
       } else {
-        await fetch(`/api/posts/${post._id}/likes`, { method: "POST" });
+        const temporaryLike = {
+          _id: `pending-${user.userId}`,
+          byUser: {
+            _id: user.userId,
+            name: user.name,
+          },
+        };
+        const optimisticPost = {
+          ...post,
+          likes: [...post.likes, temporaryLike],
+        };
+        onPostChanged?.(optimisticPost);
+
+        const response = await fetch(`/api/posts/${post._id}/likes`, { method: "POST" });
+        const data = (await response.json().catch(() => null)) as {
+          resultLikeID?: string;
+        } | null;
+
+        if (!response.ok) {
+          throw new Error("Could not add like.");
+        }
+
+        const resultLikeID = data?.resultLikeID;
+        if (resultLikeID) {
+          onPostChanged?.({
+            ...optimisticPost,
+            likes: optimisticPost.likes.map((like) =>
+              like._id === temporaryLike._id
+                ? { ...like, _id: resultLikeID }
+                : like,
+            ),
+          });
+        }
       }
-      onUpdated();
+
+      if (!onPostChanged) {
+        onUpdated();
+      }
+    } catch {
+      onPostChanged?.(previousPost);
     } finally {
       setBusy(false);
     }
@@ -88,7 +143,7 @@ export function PostModal({ post, onClose, onUpdated, onTagClick }: PostModalPro
         data-lenis-prevent
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-3">
+        <div className="flex items-center justify-between border-b border-border px-4 py-3">
           <h2 className="ui-title text-sm font-medium">post</h2>
           <button type="button" onClick={onClose} className="ui-btn">
             [ x ]
@@ -122,7 +177,7 @@ export function PostModal({ post, onClose, onUpdated, onTagClick }: PostModalPro
             </span>
           </div>
 
-          <div className="space-y-3 border-t border-[var(--border)] pt-4">
+          <div className="space-y-3 border-t border-border pt-4">
             <h3 className="ui-title text-sm font-medium">comments</h3>
 
             {post.comments.length === 0 ? (
@@ -132,7 +187,7 @@ export function PostModal({ post, onClose, onUpdated, onTagClick }: PostModalPro
                 {post.comments.map((item) => (
                   <li
                     key={item._id}
-                    className="border border-[var(--border)] bg-[var(--background)] px-3 py-2 text-sm"
+                    className="border border-border bg-background px-3 py-2 text-sm"
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div>

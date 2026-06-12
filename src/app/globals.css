@@ -659,7 +659,9 @@ main :where(h1, h2) {
     0 0 14px rgba(255, 188, 72, 0.36),
     0 0 34px rgba(255, 142, 31, 0.18);
   background: none;
+  cursor: text;
   overflow: visible;
+  user-select: all;
   animation: home-title-bulb-flicker 8.5s steps(1, end) infinite;
 }
 

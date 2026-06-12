@@ -1,6 +1,7 @@
 import { ChatPanel } from "@/components/ChatPanel";
 import { PostedBanner } from "@/components/PostedBanner";
 import { PostFeed } from "@/components/PostFeed";
+import { SelectableHeroTitle } from "@/components/SelectableHeroTitle";
 import { buildActivityFromPosts } from "@/lib/activity";
 import { getAllPosts, getTagCounts, serializePost } from "@/lib/posts";
 import type { PostPublic, TagCount } from "@/types";
@@ -30,12 +31,10 @@ export default async function HomePage() {
         <PostedBanner />
 
         <div className="mb-5">
-          <h1
+          <SelectableHeroTitle
             className="home-hero-title ui-title font-semibold"
-            data-text="what song are you listening to?"
-          >
-            what song are you listening to?
-          </h1>
+            text="what song are you listening to?"
+          />
           <p className="ui-muted mt-2 text-sm leading-relaxed">
             songs shared by the community — like, comment, and find your next
             favorite track.

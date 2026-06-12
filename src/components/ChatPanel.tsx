@@ -475,15 +475,19 @@ export function ChatPanel({ activityEvents = [], className = "" }: ChatPanelProp
           )}
           <div ref={messagesEndRef} />
         </div>
-        {showJumpToPresent && (
-          <button
-            type="button"
-            onClick={jumpToPresent}
-            className="ui-btn ui-btn-accent absolute! bottom-3 left-1/2 z-50! -translate-x-1/2 bg-surface! shadow-lg text-xs"
-          >
-            jump to present
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={jumpToPresent}
+          className={`ui-btn ui-btn-accent absolute! bottom-3 left-1/2 z-50! bg-surface! shadow-lg text-xs transition-all duration-700 ease-out ${
+            showJumpToPresent
+              ? "-translate-x-1/2 translate-y-0 scale-100 opacity-100"
+              : "pointer-events-none -translate-x-1/2 translate-y-5 scale-95 opacity-0"
+          }`}
+          aria-hidden={!showJumpToPresent}
+          tabIndex={showJumpToPresent ? 0 : -1}
+        >
+          jump to present
+        </button>
       </div>
 
       <form onSubmit={handleSubmit} className="shrink-0 border-t border-border p-3">

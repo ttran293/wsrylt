@@ -1,7 +1,18 @@
 import mongoose, { Schema, type InferSchemaType, type Model } from "mongoose";
+import {
+  MAX_USERNAME_LENGTH,
+  MIN_USERNAME_LENGTH,
+} from "@/lib/validation/username";
 
 const UserSchema = new Schema({
-  name: { type: String, required: true, unique: true },
+  name: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true,
+    minlength: MIN_USERNAME_LENGTH,
+    maxlength: MAX_USERNAME_LENGTH,
+  },
   email: { type: String, required: true, unique: true, lowercase: true, trim: true },
   information: { type: String, maxlength: 150, default: "" },
   imageUrl: { type: String, default: "" },

@@ -5,9 +5,10 @@ import { z } from "zod";
 import { connectDB } from "@/lib/mongodb";
 import { User } from "@/lib/models/User";
 import { passwordSchema } from "@/lib/validation/password";
+import { usernameSchema } from "@/lib/validation/username";
 
 const signupSchema = z.object({
-  name: z.string().trim().min(1, "Username is required."),
+  name: usernameSchema,
   email: z
     .string()
     .trim()

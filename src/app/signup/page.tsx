@@ -4,6 +4,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
+import {
+  MAX_USERNAME_LENGTH,
+  MIN_USERNAME_LENGTH,
+} from "@/lib/validation/username";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -14,6 +18,10 @@ export default function SignupPage() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
+  const trimmedName = name.trim();
+  const usernameValid =
+    trimmedName.length >= MIN_USERNAME_LENGTH &&
+    trimmedName.length <= MAX_USERNAME_LENGTH;
   const emailValid = email.trim().length > 0 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 
   const passwordValid =
@@ -36,13 +44,18 @@ export default function SignupPage() {
       return;
     }
 
+    if (!usernameValid) {
+      setError(`Username must be ${MIN_USERNAME_LENGTH}-${MAX_USERNAME_LENGTH} characters.`);
+      return;
+    }
+
     setBusy(true);
 
     try {
       const response = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name: trimmedName, email, password }),
       });
 
       const data = await response.json();
@@ -52,7 +65,7 @@ export default function SignupPage() {
       }
 
       const result = await signIn("credentials", {
-        name,
+        name: trimmedName,
         password,
         redirect: false,
       });
@@ -88,6 +101,8 @@ export default function SignupPage() {
               id="name"
               type="text"
               required
+              minLength={MIN_USERNAME_LENGTH}
+              maxLength={MAX_USERNAME_LENGTH}
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="ui-input mt-1"
@@ -137,19 +152,22 @@ export default function SignupPage() {
           </div>
 
           <ul className="ui-muted space-y-1 text-xs">
-            <li className={password.length >= 6 ? "text-[var(--accent)]" : ""}>
+            <li className={usernameValid ? "text-accent" : ""}>
+              username is {MIN_USERNAME_LENGTH}-{MAX_USERNAME_LENGTH} characters
+            </li>
+            <li className={password.length >= 6 ? "text-accent" : ""}>
               at least 6 characters
             </li>
-            <li className={/[A-Z]/.test(password) ? "text-[var(--accent)]" : ""}>
+            <li className={/[A-Z]/.test(password) ? "text-accent" : ""}>
               one uppercase letter
             </li>
-            <li className={/[0-9]/.test(password) ? "text-[var(--accent)]" : ""}>
+            <li className={/[0-9]/.test(password) ? "text-accent" : ""}>
               one number
             </li>
             <li
               className={
                 password === confirmPassword && confirmPassword
-                  ? "text-[var(--accent)]"
+                  ? "text-accent"
                   : ""
               }
             >
@@ -165,7 +183,7 @@ export default function SignupPage() {
 
           <button
             type="submit"
-            disabled={busy || !emailValid || !passwordValid}
+            disabled={busy || !usernameValid || !emailValid || !passwordValid}
             className="ui-btn ui-btn-accent w-full"
           >
             {busy ? "[ creating account... ]" : "[ sign up ]"}

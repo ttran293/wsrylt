@@ -3,11 +3,17 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   MAX_USERNAME_LENGTH,
   MIN_USERNAME_LENGTH,
 } from "@/lib/validation/username-constants";
+
+type UsernameCheckResult = {
+  error?: string;
+  name: string;
+  valid: boolean;
+};
 
 export default function SignupPage() {
   const router = useRouter();
@@ -16,12 +22,36 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [usernameCheck, setUsernameCheck] = useState<UsernameCheckResult | null>(
+    null,
+  );
   const [busy, setBusy] = useState(false);
 
   const trimmedName = name.trim();
-  const usernameValid =
+  const hasUsername = trimmedName.length > 0;
+  const usernameLengthValid =
     trimmedName.length >= MIN_USERNAME_LENGTH &&
     trimmedName.length <= MAX_USERNAME_LENGTH;
+  const currentUsernameCheck =
+    usernameCheck?.name === trimmedName ? usernameCheck : null;
+  const usernameChecking =
+    hasUsername && usernameLengthValid && !currentUsernameCheck;
+  const usernameValid =
+    usernameLengthValid && currentUsernameCheck?.valid === true;
+  const usernameFeedback = !hasUsername
+    ? ""
+    : !usernameLengthValid
+      ? `Username must be ${MIN_USERNAME_LENGTH}-${MAX_USERNAME_LENGTH} characters.`
+      : usernameChecking
+        ? "checking username..."
+        : currentUsernameCheck?.valid
+          ? "username is available"
+          : currentUsernameCheck?.error ?? "Username is invalid.";
+  const usernameFeedbackClass = currentUsernameCheck?.valid
+    ? "text-accent"
+    : usernameChecking
+      ? "ui-muted"
+      : "text-red-300";
   const emailValid = email.trim().length > 0 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 
   const passwordValid =
@@ -29,6 +59,54 @@ export default function SignupPage() {
     /[A-Z]/.test(password) &&
     /[0-9]/.test(password) &&
     password === confirmPassword;
+
+  useEffect(() => {
+    if (!trimmedName || !usernameLengthValid) {
+      return;
+    }
+
+    let cancelled = false;
+
+    const timeoutId = window.setTimeout(async () => {
+      try {
+        const response = await fetch(
+          `/api/auth/username?name=${encodeURIComponent(trimmedName)}`,
+        );
+        const data = (await response.json().catch(() => null)) as {
+          valid?: boolean;
+          error?: string;
+        } | null;
+
+        if (cancelled) {
+          return;
+        }
+
+        if (!response.ok || !data?.valid) {
+          setUsernameCheck({
+            name: trimmedName,
+            valid: false,
+            error: data?.error ?? "Username is invalid.",
+          });
+          return;
+        }
+
+        setUsernameCheck({ name: trimmedName, valid: true });
+      } catch {
+        if (!cancelled) {
+          setUsernameCheck({
+            name: trimmedName,
+            valid: false,
+            error: "Could not check username.",
+          });
+        }
+      }
+    }, 300);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeoutId);
+    };
+  }, [trimmedName, usernameLengthValid]);
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -44,8 +122,13 @@ export default function SignupPage() {
       return;
     }
 
-    if (!usernameValid) {
+    if (!usernameLengthValid) {
       setError(`Username must be ${MIN_USERNAME_LENGTH}-${MAX_USERNAME_LENGTH} characters.`);
+      return;
+    }
+
+    if (!usernameValid) {
+      setError(usernameFeedback || "Username is invalid.");
       return;
     }
 
@@ -104,9 +187,17 @@ export default function SignupPage() {
               minLength={MIN_USERNAME_LENGTH}
               maxLength={MAX_USERNAME_LENGTH}
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => {
+                setName(e.target.value);
+                setError("");
+              }}
               className="ui-input mt-1"
             />
+            {usernameFeedback && (
+              <p className={`mt-1 text-xs ${usernameFeedbackClass}`}>
+                {usernameFeedback}
+              </p>
+            )}
           </div>
 
           <div>
@@ -152,8 +243,11 @@ export default function SignupPage() {
           </div>
 
           <ul className="ui-muted space-y-1 text-xs">
-            <li className={usernameValid ? "text-accent" : ""}>
+            <li className={usernameLengthValid ? "text-accent" : ""}>
               username is {MIN_USERNAME_LENGTH}-{MAX_USERNAME_LENGTH} characters
+            </li>
+            <li className={usernameValid ? "text-accent" : ""}>
+              username is allowed and available
             </li>
             <li className={password.length >= 6 ? "text-accent" : ""}>
               at least 6 characters

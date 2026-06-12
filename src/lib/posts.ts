@@ -1,7 +1,7 @@
 import "@/lib/models";
 import { MusicPost } from "@/lib/models/MusicPost";
 
-const postPopulate = [
+export const postPopulate = [
   { path: "creator", select: "name information datejoin email imageUrl" },
   {
     path: "comments",

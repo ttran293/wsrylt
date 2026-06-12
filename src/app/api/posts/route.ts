@@ -5,8 +5,10 @@ import { connectDB } from "@/lib/mongodb";
 import { requireAuth } from "@/lib/auth";
 import { MusicPost } from "@/lib/models/MusicPost";
 import { User } from "@/lib/models/User";
-import { getAllPosts, serializePost } from "@/lib/posts";
+import { getAllPosts, postPopulate, serializePost } from "@/lib/posts";
 import { resolveMediaUrl } from "@/lib/media";
+import { POSTS_CHANNEL, POST_CREATED_EVENT } from "@/lib/post-events";
+import { getPusherServer } from "@/lib/pusher";
 import { tagsSchema, normalizeTag } from "@/lib/validation/tags";
 
 const createPostSchema = z.object({
@@ -85,6 +87,24 @@ export async function POST(request: NextRequest) {
 
     user.posts.push(post._id);
     await user.save();
+
+    if (
+      process.env.PUSHER_APP_ID &&
+      process.env.NEXT_PUBLIC_PUSHER_KEY &&
+      process.env.PUSHER_SECRET &&
+      process.env.NEXT_PUBLIC_PUSHER_CLUSTER
+    ) {
+      try {
+        await post.populate(postPopulate);
+        await getPusherServer().trigger(
+          POSTS_CHANNEL,
+          POST_CREATED_EVENT,
+          serializePost(post.toObject()),
+        );
+      } catch (eventError) {
+        console.error("Post realtime event error:", eventError);
+      }
+    }
 
     return Response.json({ status: "201", message: "Success." }, { status: 201 });
   } catch (error) {

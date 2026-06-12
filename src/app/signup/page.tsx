@@ -7,7 +7,7 @@ import { useState } from "react";
 import {
   MAX_USERNAME_LENGTH,
   MIN_USERNAME_LENGTH,
-} from "@/lib/validation/username";
+} from "@/lib/validation/username-constants";
 
 export default function SignupPage() {
   const router = useRouter();

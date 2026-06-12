@@ -2,7 +2,7 @@ import mongoose, { Schema, type InferSchemaType, type Model } from "mongoose";
 import {
   MAX_USERNAME_LENGTH,
   MIN_USERNAME_LENGTH,
-} from "@/lib/validation/username";
+} from "@/lib/validation/username-constants";
 
 const UserSchema = new Schema({
   name: {

@@ -18,8 +18,12 @@ const titleSans = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Music Blog",
+  title: "What song are you listening to?",
   description: "Share YouTube songs, write captions, and interact through likes and comments.",
+  icons: {
+    icon: [{ url: "/disc3.gif", type: "image/gif" }],
+    shortcut: [{ url: "/disc3.gif", type: "image/gif" }],
+  },
   referrer: "strict-origin-when-cross-origin",
 };
 

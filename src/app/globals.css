@@ -71,6 +71,23 @@ body > * {
   z-index: 1000;
 }
 
+.header-visitor-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+@media (max-width: 767px) {
+  .header-visitor-center {
+    position: static;
+    order: 3;
+    width: 100%;
+    transform: none;
+    justify-content: center;
+    display: flex;
+  }
+}
+
 .ui-panel {
   border: 1px solid color-mix(in srgb, var(--border) 85%, #ffffff 15%);
   background: color-mix(in srgb, var(--surface) 92%, #000000 8%);
@@ -81,6 +98,35 @@ body > * {
 
 .chat-panel {
   min-height: 24rem;
+}
+
+.pixel-divider {
+  height: 0.45rem;
+  max-width: 42rem;
+  background:
+    radial-gradient(
+      circle,
+      rgba(255, 245, 172, 0.98) 0 0.13rem,
+      rgba(255, 191, 61, 0.72) 0.14rem 0.2rem,
+      transparent 0.23rem
+    )
+    0 50% / 1.05rem 100% repeat-x;
+  filter: drop-shadow(0 0 4px rgba(255, 206, 77, 0.7))
+    drop-shadow(0 0 10px rgba(255, 156, 34, 0.35));
+  opacity: 0.82;
+}
+
+.visitor-counter-label {
+  color: var(--muted);
+}
+
+.visitor-counter-digits {
+  border: 1px solid color-mix(in srgb, var(--border) 70%, #ffffff 30%);
+  background: #050505;
+  color: #7ec8ff;
+  padding: 0.05rem 0.28rem;
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 5px rgba(126, 200, 255, 0.35);
 }
 
 .chat-message {

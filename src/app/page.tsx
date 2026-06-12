@@ -39,6 +39,7 @@ export default async function HomePage() {
             songs shared by the community — like, comment, and find your next
             favorite track.
           </p>
+          <div className="pixel-divider mt-3" aria-hidden="true" />
         </div>
 
         <PostFeed initialPosts={posts} initialTags={tags} />

@@ -90,7 +90,10 @@ export function VisitorStats() {
 
   return (
     <span className="visitor-stats ui-meta inline-flex items-center gap-1 whitespace-nowrap">
-      <span>{stats ? `${stats.totalVisits} visitors` : "checking visits..."}</span>
+      <span className="visitor-counter-label">visitors:</span>
+      <span className="visitor-counter-digits">
+        {stats ? String(stats.totalVisits).padStart(6, "0") : "------"}
+      </span>
     </span>
   );
 }

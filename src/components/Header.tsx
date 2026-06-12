@@ -18,7 +18,7 @@ export function Header() {
 
   return (
     <header className="site-header crt-bg sticky top-0 border-b border-border">
-      <div className="flex w-full flex-wrap items-center gap-x-2 gap-y-3 px-4 py-3 text-sm">
+      <div className="relative flex w-full flex-wrap items-center gap-x-2 gap-y-3 px-4 py-3 text-sm">
         <nav className="flex items-center gap-2">
           <Link href="/" className={navTabClass("/")}>
             <HomeIcon className="ui-tab-icon" />
@@ -30,8 +30,11 @@ export function Header() {
           </Link>
         </nav>
 
-        <div className="ml-auto flex items-center gap-2">
+        <div className="header-visitor-center">
           <VisitorStats />
+        </div>
+
+        <div className="ml-auto flex items-center gap-2">
           {loading ? (
             <span className="ui-muted text-sm">loading...</span>
           ) : user ? (

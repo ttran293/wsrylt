@@ -1,6 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import EmojiPicker, {
+  EmojiStyle,
+  Theme,
+  type EmojiClickData,
+} from "emoji-picker-react";
 import Lenis from "lenis";
 import Pusher from "pusher-js";
 import {
@@ -23,6 +28,7 @@ const CHAT_PAGE_LIMIT = 25;
 const TOP_LOAD_THRESHOLD = 80;
 const BOTTOM_PRESENT_THRESHOLD = 80;
 const JUMP_TO_PRESENT_DELAY_MS = 3000;
+const CHAT_MESSAGE_MAX_LENGTH = 500;
 const pusherKey = process.env.NEXT_PUBLIC_PUSHER_KEY;
 const pusherCluster = process.env.NEXT_PUBLIC_PUSHER_CLUSTER;
 const pusherConfigError =
@@ -105,6 +111,8 @@ export function ChatPanel({ activityEvents = [], className = "" }: ChatPanelProp
   const [loadingOlder, setLoadingOlder] = useState(false);
   const [atLatest, setAtLatest] = useState(true);
   const [showJumpToPresent, setShowJumpToPresent] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
   const scrollWrapperRef = useRef<HTMLDivElement>(null);
   const scrollContentRef = useRef<HTMLDivElement>(null);
   const communityScrollerRef = useRef<Lenis | null>(null);
@@ -363,6 +371,26 @@ export function ChatPanel({ activityEvents = [], className = "" }: ChatPanelProp
     setShowJumpToPresent(false);
   }
 
+  function insertEmoji(emojiData: EmojiClickData) {
+    const input = inputRef.current;
+    const selectionStart = input?.selectionStart ?? body.length;
+    const selectionEnd = input?.selectionEnd ?? selectionStart;
+    const nextBody = `${body.slice(0, selectionStart)}${emojiData.emoji}${body.slice(
+      selectionEnd,
+    )}`.slice(0, CHAT_MESSAGE_MAX_LENGTH);
+    const nextCursor = Math.min(
+      selectionStart + emojiData.emoji.length,
+      nextBody.length,
+    );
+
+    setBody(nextBody);
+    setShowEmojiPicker(false);
+    window.requestAnimationFrame(() => {
+      input?.focus();
+      input?.setSelectionRange(nextCursor, nextCursor);
+    });
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const trimmed = body.trim();
@@ -387,6 +415,7 @@ export function ChatPanel({ activityEvents = [], className = "" }: ChatPanelProp
       shouldScrollToBottomRef.current = true;
       setMessages((current) => appendMessage(current, message));
       setBody("");
+      setShowEmojiPicker(false);
     } catch (sendError) {
       setError(sendError instanceof Error ? sendError.message : "Could not send message.");
     } finally {
@@ -494,12 +523,43 @@ export function ChatPanel({ activityEvents = [], className = "" }: ChatPanelProp
         {error && <p className="ui-muted mb-2 text-xs">{error}</p>}
 
         {user ? (
-          <div className="flex gap-2">
+          <div className="relative flex gap-2">
+            {showEmojiPicker && (
+              <div
+                className="absolute bottom-full left-0 z-50 mb-2 w-[min(24rem,calc(100vw-2rem))]"
+                data-lenis-prevent
+                onTouchMove={(event) => event.stopPropagation()}
+                onWheel={(event) => event.stopPropagation()}
+              >
+                <EmojiPicker
+                  className="chat-emoji-picker"
+                  emojiStyle={EmojiStyle.NATIVE}
+                  height={340}
+                  previewConfig={{ showPreview: false }}
+                  searchPlaceHolder="search emoji"
+                  skinTonesDisabled
+                  theme={Theme.DARK}
+                  width="100%"
+                  onEmojiClick={insertEmoji}
+                />
+              </div>
+            )}
+            <button
+              type="button"
+              className="ui-btn"
+              disabled={busy}
+              aria-expanded={showEmojiPicker}
+              aria-label="add emoji"
+              onClick={() => setShowEmojiPicker((current) => !current)}
+            >
+              :)
+            </button>
             <input
+              ref={inputRef}
               type="text"
               value={body}
               onChange={(event) => setBody(event.target.value)}
-              maxLength={500}
+              maxLength={CHAT_MESSAGE_MAX_LENGTH}
               placeholder="say something..."
               className="ui-input min-w-0 flex-1"
               disabled={busy}

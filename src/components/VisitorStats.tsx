@@ -90,7 +90,7 @@ export function VisitorStats() {
 
   return (
     <span className="visitor-stats ui-meta inline-flex items-center gap-1 whitespace-nowrap">
-      <span>{stats ? `${stats.totalVisits} total visits` : "checking visits..."}</span>
+      <span>{stats ? `${stats.totalVisits} visitors` : "checking visits..."}</span>
     </span>
   );
 }

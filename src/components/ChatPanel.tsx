@@ -113,6 +113,7 @@ export function ChatPanel({ activityEvents = [], className = "" }: ChatPanelProp
   const [showJumpToPresent, setShowJumpToPresent] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const shouldRefocusInputRef = useRef(false);
   const scrollWrapperRef = useRef<HTMLDivElement>(null);
   const scrollContentRef = useRef<HTMLDivElement>(null);
   const communityScrollerRef = useRef<Lenis | null>(null);
@@ -165,6 +166,21 @@ export function ChatPanel({ activityEvents = [], className = "" }: ChatPanelProp
   useEffect(() => {
     atLatestRef.current = atLatest;
   }, [atLatest]);
+
+  useEffect(() => {
+    if (busy || !shouldRefocusInputRef.current) {
+      return;
+    }
+
+    shouldRefocusInputRef.current = false;
+    const frameId = window.requestAnimationFrame(() => {
+      inputRef.current?.focus();
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+    };
+  }, [busy]);
 
   const loadOlderMessages = useCallback(async () => {
     const cursor = nextCursorRef.current;
@@ -413,6 +429,7 @@ export function ChatPanel({ activityEvents = [], className = "" }: ChatPanelProp
 
       const message = (await response.json()) as ChatMessagePublic;
       shouldScrollToBottomRef.current = true;
+      shouldRefocusInputRef.current = true;
       setMessages((current) => appendMessage(current, message));
       setBody("");
       setShowEmojiPicker(false);

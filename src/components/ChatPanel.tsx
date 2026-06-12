@@ -3,15 +3,26 @@
 import Link from "next/link";
 import Lenis from "lenis";
 import Pusher from "pusher-js";
-import { Fragment, type FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import {
+  Fragment,
+  type FormEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { format } from "date-fns";
 import { useAuth } from "@/components/AuthProvider";
 import { VisitorLiveCount } from "@/components/VisitorStats";
 import type { ActivityEvent } from "@/lib/activity";
-import type { ChatMessagePublic } from "@/lib/chat";
+import type { ChatMessagePublic, ChatMessagesPage } from "@/lib/chat";
 import { CHAT_CHANNEL, CHAT_MESSAGE_EVENT } from "@/lib/chat-events";
 
-const MAX_MESSAGES = 50;
+const CHAT_PAGE_LIMIT = 25;
+const TOP_LOAD_THRESHOLD = 80;
+const BOTTOM_PRESENT_THRESHOLD = 80;
+const JUMP_TO_PRESENT_DELAY_MS = 3000;
 const pusherKey = process.env.NEXT_PUBLIC_PUSHER_KEY;
 const pusherCluster = process.env.NEXT_PUBLIC_PUSHER_CLUSTER;
 const pusherConfigError =
@@ -38,7 +49,18 @@ function appendMessage(messages: ChatMessagePublic[], message: ChatMessagePublic
     return messages;
   }
 
-  return [...messages, message].slice(-MAX_MESSAGES);
+  return [...messages, message];
+}
+
+function prependMessages(
+  messages: ChatMessagePublic[],
+  olderMessages: ChatMessagePublic[],
+) {
+  const existingIds = new Set(messages.map((message) => message._id));
+  return [
+    ...olderMessages.filter((message) => !existingIds.has(message._id)),
+    ...messages,
+  ];
 }
 
 function ChatAuthor({
@@ -78,10 +100,26 @@ export function ChatPanel({ activityEvents = [], className = "" }: ChatPanelProp
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(pusherConfigError);
   const [connected, setConnected] = useState(false);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingOlder, setLoadingOlder] = useState(false);
+  const [atLatest, setAtLatest] = useState(true);
+  const [showJumpToPresent, setShowJumpToPresent] = useState(false);
   const scrollWrapperRef = useRef<HTMLDivElement>(null);
   const scrollContentRef = useRef<HTMLDivElement>(null);
   const communityScrollerRef = useRef<Lenis | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const nextCursorRef = useRef<string | null>(null);
+  const hasMoreRef = useRef(false);
+  const loadingOlderRef = useRef(false);
+  const atLatestRef = useRef(true);
+  const shouldScrollToBottomRef = useRef(true);
+  const loadOlderMessagesRef = useRef<() => void>(() => {});
+  const jumpToPresentTimeoutRef = useRef<number | null>(null);
+  const pendingScrollRestoreRef = useRef<{
+    scroll: number;
+    height: number;
+  } | null>(null);
   const communityItems = useMemo(
     () =>
       [
@@ -105,15 +143,79 @@ export function ChatPanel({ activityEvents = [], className = "" }: ChatPanelProp
   );
 
   useEffect(() => {
+    nextCursorRef.current = nextCursor;
+  }, [nextCursor]);
+
+  useEffect(() => {
+    hasMoreRef.current = hasMore;
+  }, [hasMore]);
+
+  useEffect(() => {
+    loadingOlderRef.current = loadingOlder;
+  }, [loadingOlder]);
+
+  useEffect(() => {
+    atLatestRef.current = atLatest;
+  }, [atLatest]);
+
+  const loadOlderMessages = useCallback(async () => {
+    const cursor = nextCursorRef.current;
+    if (!cursor || !hasMoreRef.current || loadingOlderRef.current) {
+      return;
+    }
+
+    const scroller = communityScrollerRef.current;
+    const content = scrollContentRef.current;
+    pendingScrollRestoreRef.current = {
+      scroll: scroller?.scroll ?? 0,
+      height: content?.scrollHeight ?? 0,
+    };
+
+    loadingOlderRef.current = true;
+    setLoadingOlder(true);
+    setError("");
+
+    try {
+      const response = await fetch(
+        `/api/chat/messages?limit=${CHAT_PAGE_LIMIT}&before=${encodeURIComponent(cursor)}`,
+      );
+
+      if (!response.ok) {
+        throw new Error("Could not load older chatter.");
+      }
+
+      const data = (await response.json()) as ChatMessagesPage;
+      setMessages((current) => prependMessages(current, data.messages));
+      setNextCursor(data.nextCursor);
+      setHasMore(data.hasMore);
+    } catch {
+      setError("Could not load older chatter.");
+      pendingScrollRestoreRef.current = null;
+    } finally {
+      loadingOlderRef.current = false;
+      setLoadingOlder(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadOlderMessagesRef.current = () => {
+      void loadOlderMessages();
+    };
+  }, [loadOlderMessages]);
+
+  useEffect(() => {
     let cancelled = false;
 
     async function loadMessages() {
       try {
-        const response = await fetch("/api/chat/messages");
+        const response = await fetch(`/api/chat/messages?limit=${CHAT_PAGE_LIMIT}`);
         if (!response.ok) throw new Error("Could not load chat.");
-        const data = (await response.json()) as ChatMessagePublic[];
+        const data = (await response.json()) as ChatMessagesPage;
         if (!cancelled) {
-          setMessages(data);
+          shouldScrollToBottomRef.current = true;
+          setMessages(data.messages);
+          setNextCursor(data.nextCursor);
+          setHasMore(data.hasMore);
         }
       } catch {
         if (!cancelled) {
@@ -142,6 +244,9 @@ export function ChatPanel({ activityEvents = [], className = "" }: ChatPanelProp
     pusher.connection.bind("unavailable", () => setConnected(false));
 
     channel.bind(CHAT_MESSAGE_EVENT, (message: ChatMessagePublic) => {
+      if (atLatestRef.current) {
+        shouldScrollToBottomRef.current = true;
+      }
       setMessages((current) => appendMessage(current, message));
     });
 
@@ -164,10 +269,41 @@ export function ChatPanel({ activityEvents = [], className = "" }: ChatPanelProp
       smoothWheel: true,
       autoRaf: true,
     });
+    const unsubscribe = lenis.on("scroll", (instance) => {
+      const isNearBottom =
+        instance.limit - instance.scroll <= BOTTOM_PRESENT_THRESHOLD;
+      if (atLatestRef.current !== isNearBottom) {
+        atLatestRef.current = isNearBottom;
+        setAtLatest(isNearBottom);
+
+        if (jumpToPresentTimeoutRef.current) {
+          window.clearTimeout(jumpToPresentTimeoutRef.current);
+          jumpToPresentTimeoutRef.current = null;
+        }
+
+        if (isNearBottom) {
+          setShowJumpToPresent(false);
+        } else {
+          jumpToPresentTimeoutRef.current = window.setTimeout(() => {
+            setShowJumpToPresent(true);
+            jumpToPresentTimeoutRef.current = null;
+          }, JUMP_TO_PRESENT_DELAY_MS);
+        }
+      }
+
+      if (instance.scroll <= TOP_LOAD_THRESHOLD) {
+        loadOlderMessagesRef.current();
+      }
+    });
 
     communityScrollerRef.current = lenis;
 
     return () => {
+      if (jumpToPresentTimeoutRef.current) {
+        window.clearTimeout(jumpToPresentTimeoutRef.current);
+        jumpToPresentTimeoutRef.current = null;
+      }
+      unsubscribe();
       lenis.destroy();
       if (communityScrollerRef.current === lenis) {
         communityScrollerRef.current = null;
@@ -179,16 +315,53 @@ export function ChatPanel({ activityEvents = [], className = "" }: ChatPanelProp
     communityScrollerRef.current?.resize();
     window.requestAnimationFrame(() => {
       const scroller = communityScrollerRef.current;
+      const content = scrollContentRef.current;
       const endMarker = messagesEndRef.current;
+      const scrollRestore = pendingScrollRestoreRef.current;
+
+      if (scrollRestore && scroller && content) {
+        pendingScrollRestoreRef.current = null;
+        scroller.resize();
+        scroller.scrollTo(
+          scrollRestore.scroll + content.scrollHeight - scrollRestore.height,
+          { immediate: true },
+        );
+        return;
+      }
 
       if (!scroller || !endMarker) {
         endMarker?.scrollIntoView({ block: "end" });
         return;
       }
 
-      scroller.scrollTo(endMarker, { immediate: true });
+      if (shouldScrollToBottomRef.current || atLatestRef.current) {
+        shouldScrollToBottomRef.current = false;
+        scroller.scrollTo(endMarker, { immediate: true });
+        atLatestRef.current = true;
+        setAtLatest(true);
+      }
     });
   }, [communityItems.length]);
+
+  function jumpToPresent() {
+    const scroller = communityScrollerRef.current;
+    const endMarker = messagesEndRef.current;
+
+    if (scroller && endMarker) {
+      scroller.scrollTo(endMarker, { immediate: true });
+    } else {
+      endMarker?.scrollIntoView({ block: "end" });
+    }
+
+    atLatestRef.current = true;
+    shouldScrollToBottomRef.current = false;
+    if (jumpToPresentTimeoutRef.current) {
+      window.clearTimeout(jumpToPresentTimeoutRef.current);
+      jumpToPresentTimeoutRef.current = null;
+    }
+    setAtLatest(true);
+    setShowJumpToPresent(false);
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -211,6 +384,7 @@ export function ChatPanel({ activityEvents = [], className = "" }: ChatPanelProp
       }
 
       const message = (await response.json()) as ChatMessagePublic;
+      shouldScrollToBottomRef.current = true;
       setMessages((current) => appendMessage(current, message));
       setBody("");
     } catch (sendError) {
@@ -229,8 +403,15 @@ export function ChatPanel({ activityEvents = [], className = "" }: ChatPanelProp
         </span>
       </div>
 
-      <div ref={scrollWrapperRef} className="min-h-0 flex-1 overflow-hidden" data-lenis-prevent>
+      <div
+        ref={scrollWrapperRef}
+        className="relative min-h-0 flex-1 overflow-hidden"
+        data-lenis-prevent
+      >
         <div ref={scrollContentRef} className="px-5 py-4">
+          {loadingOlder && (
+            <p className="ui-muted pb-3 text-center text-xs">loading older chatter...</p>
+          )}
           {communityItems.length === 0 ? (
             <p className="ui-muted text-sm">no community updates yet</p>
           ) : (
@@ -294,6 +475,15 @@ export function ChatPanel({ activityEvents = [], className = "" }: ChatPanelProp
           )}
           <div ref={messagesEndRef} />
         </div>
+        {showJumpToPresent && (
+          <button
+            type="button"
+            onClick={jumpToPresent}
+            className="ui-btn ui-btn-accent absolute! bottom-3 left-1/2 z-50! -translate-x-1/2 bg-surface! shadow-lg text-xs"
+          >
+            jump to present
+          </button>
+        )}
       </div>
 
       <form onSubmit={handleSubmit} className="shrink-0 border-t border-border p-3">

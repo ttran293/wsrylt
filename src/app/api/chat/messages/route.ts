@@ -1,7 +1,11 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
 import { requireAuth } from "@/lib/auth";
-import { serializeChatMessage, getRecentChatMessages } from "@/lib/chat";
+import {
+  CHAT_HISTORY_LIMIT,
+  serializeChatMessage,
+  getChatMessagesPage,
+} from "@/lib/chat";
 import { CHAT_CHANNEL, CHAT_MESSAGE_EVENT } from "@/lib/chat-events";
 import { connectDB } from "@/lib/mongodb";
 import { ChatMessage } from "@/lib/models/ChatMessage";
@@ -13,10 +17,23 @@ const chatMessageSchema = z.object({
   body: z.string().trim().min(1).max(500),
 });
 
-export async function GET() {
+const chatMessagesQuerySchema = z.object({
+  before: z.string().optional(),
+  limit: z.coerce.number().int().min(1).max(50).default(CHAT_HISTORY_LIMIT),
+});
+
+export async function GET(request: NextRequest) {
   try {
-    const messages = await getRecentChatMessages();
-    return Response.json(messages);
+    const parsed = chatMessagesQuerySchema.safeParse({
+      before: request.nextUrl.searchParams.get("before") ?? undefined,
+      limit: request.nextUrl.searchParams.get("limit") ?? undefined,
+    });
+
+    if (!parsed.success) {
+      return Response.json({ error: "Invalid chat query." }, { status: 400 });
+    }
+
+    return Response.json(await getChatMessagesPage(parsed.data));
   } catch (error) {
     console.error("Get chat messages error:", error);
     return Response.json(

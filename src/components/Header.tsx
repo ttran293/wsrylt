@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { NotificationsMenu } from "@/components/NotificationsMenu";
 import { HomeIcon, LogInIcon, NewPostIcon, SignUpIcon } from "@/components/NavIcons";
+import { VisitorStats } from "@/components/VisitorStats";
 
 export function Header() {
   const pathname = usePathname();
@@ -30,6 +31,7 @@ export function Header() {
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
+          <VisitorStats />
           {loading ? (
             <span className="ui-muted text-sm">loading...</span>
           ) : user ? (

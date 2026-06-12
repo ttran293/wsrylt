@@ -81,3 +81,16 @@ export interface UserCommentEntry {
   date: string;
   post: UserPostRef;
 }
+
+export interface VisitorDailyStat {
+  date: string;
+  visits: number;
+  visitors: number;
+}
+
+export interface VisitorStatsPublic {
+  online: number;
+  todayVisits: number;
+  totalVisits: number;
+  last7Days: VisitorDailyStat[];
+}

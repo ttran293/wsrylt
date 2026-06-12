@@ -6,6 +6,7 @@ import Pusher from "pusher-js";
 import { Fragment, type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { format } from "date-fns";
 import { useAuth } from "@/components/AuthProvider";
+import { VisitorLiveCount } from "@/components/VisitorStats";
 import type { ActivityEvent } from "@/lib/activity";
 import type { ChatMessagePublic } from "@/lib/chat";
 import { CHAT_CHANNEL, CHAT_MESSAGE_EVENT } from "@/lib/chat-events";
@@ -224,7 +225,7 @@ export function ChatPanel({ activityEvents = [], className = "" }: ChatPanelProp
       <div className="flex shrink-0 items-center justify-between border-b border-border px-5 py-3.5">
         <h2 className="ui-title text-sm font-medium">community</h2>
         <span className={`ui-meta ${connected ? "text-[#7ec8ff]" : ""}`}>
-          {connected ? "live" : "offline"}
+          <VisitorLiveCount fallback={connected ? "live" : "offline"} />
         </span>
       </div>
 

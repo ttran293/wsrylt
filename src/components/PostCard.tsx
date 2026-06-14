@@ -177,13 +177,11 @@ export function PostCard({
                   </button>
                 </div>
               </div>
-            ) : (
+            ) : post.caption ? (
               <p className="ui-body text-sm">
-                {post.caption || (
-                  <span className="ui-muted italic">no caption</span>
-                )}
+                {post.caption}
               </p>
-            )}
+            ) : null}
           </div>
           {isOwner && !editingCaption && (
             <button

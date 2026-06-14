@@ -29,6 +29,7 @@ const TOP_LOAD_THRESHOLD = 80;
 const BOTTOM_PRESENT_THRESHOLD = 80;
 const JUMP_TO_PRESENT_DELAY_MS = 3000;
 const CHAT_MESSAGE_MAX_LENGTH = 500;
+const RECENT_CHAT_ANIMATION_WINDOW_MS = 60 * 60 * 1000;
 const pusherKey = process.env.NEXT_PUBLIC_PUSHER_KEY;
 const pusherCluster = process.env.NEXT_PUBLIC_PUSHER_CLUSTER;
 const pusherConfigError =
@@ -56,6 +57,15 @@ function appendMessage(messages: ChatMessagePublic[], message: ChatMessagePublic
   }
 
   return [...messages, message];
+}
+
+function isRecentChatItem(date: string, now: number): boolean {
+  const timestamp = new Date(date).getTime();
+  return (
+    Number.isFinite(timestamp) &&
+    timestamp <= now &&
+    now - timestamp <= RECENT_CHAT_ANIMATION_WINDOW_MS
+  );
 }
 
 function prependMessages(
@@ -112,6 +122,7 @@ export function ChatPanel({ activityEvents = [], className = "" }: ChatPanelProp
   const [atLatest, setAtLatest] = useState(true);
   const [showJumpToPresent, setShowJumpToPresent] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [animationNow, setAnimationNow] = useState(() => Date.now());
   const inputRef = useRef<HTMLInputElement>(null);
   const shouldRefocusInputRef = useRef(false);
   const scrollWrapperRef = useRef<HTMLDivElement>(null);
@@ -166,6 +177,16 @@ export function ChatPanel({ activityEvents = [], className = "" }: ChatPanelProp
   useEffect(() => {
     atLatestRef.current = atLatest;
   }, [atLatest]);
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setAnimationNow(Date.now());
+    }, 60 * 1000);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, []);
 
   useEffect(() => {
     if (busy || !shouldRefocusInputRef.current) {
@@ -463,6 +484,8 @@ export function ChatPanel({ activityEvents = [], className = "" }: ChatPanelProp
           ) : (
             communityItems.map((item, index) => {
               const isLatestItem = index === communityItems.length - 1;
+              const shouldAnimateItem =
+                isLatestItem || isRecentChatItem(item.date, animationNow);
               const itemDate = formatChatDate(item.date);
               const previousDate =
                 index > 0 ? formatChatDate(communityItems[index - 1].date) : null;
@@ -484,7 +507,7 @@ export function ChatPanel({ activityEvents = [], className = "" }: ChatPanelProp
                       <span className="chat-colon">:</span>
                       <span
                         className={`chat-context wrap-break-word ${
-                          isLatestItem ? "chat-latest-text-bop" : ""
+                          shouldAnimateItem ? "chat-latest-text-bop" : ""
                         }`}
                       >
                         {item.event.message}
@@ -509,7 +532,7 @@ export function ChatPanel({ activityEvents = [], className = "" }: ChatPanelProp
                     <span className="chat-colon">:</span>
                     <span
                       className={`chat-text wrap-break-word ${
-                        isLatestItem ? "chat-latest-text-bop" : ""
+                        shouldAnimateItem ? "chat-latest-text-bop" : ""
                       }`}
                     >
                       {item.message.body}

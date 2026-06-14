@@ -26,7 +26,7 @@ export default async function HomePage() {
   const activity = buildActivityFromPosts(posts);
 
   return (
-    <div className="xl:grid xl:grid-cols-[minmax(0,1fr)_26rem] xl:items-start xl:gap-6 2xl:grid-cols-[minmax(0,1fr)_28rem]">
+    <div className="mobile-chat-layout xl:grid xl:grid-cols-[minmax(0,1fr)_26rem] xl:items-start xl:gap-6 2xl:grid-cols-[minmax(0,1fr)_28rem]">
       <div className="min-w-0">
         <PostedBanner />
 
@@ -45,10 +45,10 @@ export default async function HomePage() {
         <PostFeed initialPosts={posts} initialTags={tags} />
       </div>
 
-      <aside className="mt-8 xl:fixed xl:top-20 xl:right-4 xl:bottom-4 xl:mt-0 xl:w-104 2xl:w-md">
+      <aside className="mobile-chat-dock mt-8 xl:fixed xl:top-20 xl:right-4 xl:bottom-4 xl:mt-0 xl:w-104 2xl:w-md">
         <ChatPanel
           activityEvents={activity}
-          className="xl:h-full xl:max-h-none"
+          className="h-full max-h-none"
         />
       </aside>
     </div>

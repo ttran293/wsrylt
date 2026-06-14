@@ -100,6 +100,43 @@ body > * {
   min-height: 24rem;
 }
 
+.mobile-chat-layout {
+  padding-bottom: 30dvh;
+}
+
+.mobile-chat-dock {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 900;
+  height: 30dvh;
+}
+
+.mobile-chat-dock .chat-panel {
+  height: 100%;
+  max-height: none;
+  min-height: 0;
+}
+
+@media (min-width: 1280px) {
+  .mobile-chat-layout {
+    padding-bottom: 0;
+  }
+
+  .mobile-chat-dock {
+    right: 1rem;
+    bottom: 1rem;
+    left: auto;
+    height: auto;
+    z-index: auto;
+  }
+
+  .mobile-chat-dock .chat-panel {
+    min-height: 24rem;
+  }
+}
+
 .pixel-divider {
   height: 0.45rem;
   max-width: 42rem;

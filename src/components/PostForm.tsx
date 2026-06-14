@@ -148,8 +148,11 @@ export function PostForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mx-auto max-w-2xl space-y-6">
-      <div className="ui-panel p-6">
+    <form
+      onSubmit={handleSubmit}
+      className="mx-auto grid w-full max-w-6xl gap-6 lg:grid-cols-2 lg:items-stretch"
+    >
+      <div className="ui-panel h-full p-6">
         <h1 className="ui-title text-2xl font-medium">share a song</h1>
         <p className="ui-muted mt-2 text-sm">
           paste a youtube, spotify, soundcloud, or bandcamp link, or search
@@ -199,13 +202,16 @@ export function PostForm() {
           </div>
 
           {searchResults.length > 0 && (
-            <ul className="max-h-64 space-y-2 overflow-y-auto border border-[var(--border)] p-2" data-lenis-prevent>
+            <ul
+              className="max-h-64 space-y-2 overflow-y-auto border border-border p-2"
+              data-lenis-prevent
+            >
               {searchResults.map((result) => (
                 <li key={result.videoId}>
                   <button
                     type="button"
                     onClick={() => selectVideo(result.videoId)}
-                    className="flex w-full items-center gap-3 p-2 text-left hover:bg-[var(--surface-hover)]"
+                    className="flex w-full items-center gap-3 p-2 text-left hover:bg-(--surface-hover)"
                   >
                     {result.thumbnail && (
                       // eslint-disable-next-line @next/next/no-img-element
@@ -232,7 +238,6 @@ export function PostForm() {
               onChange={(e) => setCaption(e.target.value)}
               rows={3}
               maxLength={500}
-              placeholder="why do you love this song?"
               className="ui-input mt-1"
             />
           </div>
@@ -246,7 +251,6 @@ export function PostForm() {
               type="text"
               value={tags}
               onChange={(e) => setTags(e.target.value)}
-              placeholder="jazz, chill, late-night (up to 5)"
               className="ui-input mt-1"
             />
           </div>
@@ -267,12 +271,19 @@ export function PostForm() {
         </div>
       </div>
 
-      {previewPlayerUrl && (
-        <div className="ui-panel p-4">
-          <h2 className="ui-muted mb-3 text-sm">preview</h2>
+      <aside className="ui-panel w-full p-6 lg:sticky lg:top-24 lg:h-full">
+        <h2 className="ui-muted mb-3 text-sm">preview</h2>
+        {previewPlayerUrl ? (
           <MediaPlayer url={previewPlayerUrl} />
-        </div>
-      )}
+        ) : (
+          <div className="flex min-h-48 items-center justify-center border border-dashed border-border p-6 text-center">
+            <p className="ui-muted text-sm">
+              paste a supported music link or select a youtube result to preview it
+              here.
+            </p>
+          </div>
+        )}
+      </aside>
     </form>
   );
 }

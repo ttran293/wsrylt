@@ -82,7 +82,7 @@ export function TagFilter({
           <button
             type="button"
             onClick={() => setExpanded((value) => !value)}
-            className="ui-btn shrink-0 text-xs"
+            className="ui-tag ui-tag-link shrink-0"
           >
             {expanded ? "[ show less ]" : `[ +${hiddenCount} more ]`}
           </button>
